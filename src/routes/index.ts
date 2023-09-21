@@ -16,7 +16,7 @@ const router = Router()
 router.get("/admin",admin.Get);
 router.get("/admin/:id",admin.GetId);
 router.post("/admin",upload.single('image'),checkToken,admin.Post);
-router.post("/admin-login",checkToken,admin.SignIn);
+router.post("/admin-login",admin.SignIn);
 router.put("/admin/:id",upload.single('image'),checkToken,admin.Put);
 
 // route users
