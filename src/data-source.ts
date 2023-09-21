@@ -8,6 +8,7 @@ import { CompanyEntity } from "./entities/company"
 import { SubCategoryEntity } from "./entities/sub_category"
 import { BrandEntity } from "./entities/brand"
 import { CardsEntity } from "./entities/cards"
+import { SizeEntity } from "./entities/size"
 
 export const AppDataSource = new DataSource({
     type: "postgres",
@@ -18,7 +19,7 @@ export const AppDataSource = new DataSource({
     database: "rise_b",
     synchronize: true,
     logging: false,
-    entities: [UsersEntity,CountryEntity,AdminEntity,CategoryEntity,CompanyEntity,SubCategoryEntity,BrandEntity,CardsEntity],
+    entities: [UsersEntity,CountryEntity,AdminEntity,CategoryEntity,CompanyEntity,SubCategoryEntity,BrandEntity,CardsEntity,SizeEntity],
     migrations: [],
     subscribers: [],
 })

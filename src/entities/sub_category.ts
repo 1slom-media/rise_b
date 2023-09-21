@@ -1,7 +1,7 @@
 import { IsString } from "class-validator";
 import { Entity, PrimaryGeneratedColumn, Column,CreateDateColumn,UpdateDateColumn, OneToMany, ManyToOne } from "typeorm";
 import { CategoryEntity } from "./category";
-
+import { SizeEntity } from "./size";
 
 @Entity({ name: "sub_category" })
 export class SubCategoryEntity {
@@ -32,4 +32,7 @@ export class SubCategoryEntity {
 
     @ManyToOne(() => CategoryEntity, (category) => category.sub_category)
     category: CategoryEntity
+
+    @OneToMany(() => SizeEntity, (size) => size.sub_category)
+    size: SizeEntity[]
 }

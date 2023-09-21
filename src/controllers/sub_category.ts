@@ -6,7 +6,8 @@ class SubCategoryController {
     public async Get(req: Request, res: Response): Promise<void> {
         res.json(await AppDataSource.getRepository(SubCategoryEntity).find({
             relations: {
-                category:true
+                category:true,
+                size:true
             }, order: { id: "ASC" }
         }));
     }
@@ -16,7 +17,8 @@ class SubCategoryController {
 
         res.json(await AppDataSource.getRepository(SubCategoryEntity).find({
             relations: {
-                category:true
+                category:true,
+                size:true
             }, where: { id: +id }
         }));
     }

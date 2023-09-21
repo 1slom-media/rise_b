@@ -9,6 +9,7 @@ import admin from "../controllers/admin";
 import sub_category from "../controllers/sub_category";
 import brand from "../controllers/brand";
 import cards from "../controllers/cards";
+import size from "../controllers/size";
 
 const router = Router()
 
@@ -74,5 +75,12 @@ router.get("/cards/:id",cards.GetId);
 router.post("/cards",checkToken,cards.Post);
 router.put("/cards/:id",checkToken,cards.Put);
 router.delete("/cards/:id",checkToken,cards.Delete);
+
+// route size
+router.get("/size",size.Get);
+router.get("/size/:id",size.GetId);
+router.post("/size",checkToken,size.Post);
+router.put("/size/:id",checkToken,size.Put);
+router.delete("/size/:id",checkToken,size.Delete);
 
 export default router;
