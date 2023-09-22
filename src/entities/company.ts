@@ -2,6 +2,7 @@ import { IsString } from "class-validator";
 import { Entity, PrimaryGeneratedColumn, Column,CreateDateColumn,UpdateDateColumn, OneToMany, ManyToOne } from "typeorm";
 import { CountryEntity } from "./country";
 import { AdminEntity } from "./admin";
+import { ProductsEntity } from "./products";
 
 
 @Entity({ name: "company" })
@@ -28,4 +29,7 @@ export class CompanyEntity {
 
     @OneToMany(() => AdminEntity, (admin) => admin.company)
     admin: AdminEntity[]
+
+    @OneToMany(() => ProductsEntity, (products) => products.company)
+    products: ProductsEntity[]
 }

@@ -18,9 +18,6 @@ app.use(passport.session());
 AppDataSource.initialize().then((): void => console.log("connected")).catch((err: unknown): void => console.log(err));
 app.use('/static', express.static(path.join(process.cwd(),'uploads')))
 app.use(router);
-app.get('/', (req, res) => {
-    res.send('<a href="/auth/google">Authenticate with Google</a>,<a href="/auth/facebook">Authenticate with Facebook</a>');
-});
 
 app.listen(PORT, (): void => console.log(`http://localhost:${PORT}`));
 

@@ -9,7 +9,8 @@ class CompanyController {
         res.json(await AppDataSource.getRepository(CompanyEntity).find({
             relations: {
                 country:true,
-                admin:true
+                admin:true,
+                products:true
             }
         }));
     }
@@ -21,7 +22,8 @@ class CompanyController {
             where: { id: +id },
             relations: {
                 country:true,
-                admin:true
+                admin:true,
+                products:true
             }
         }));
     }
@@ -49,11 +51,15 @@ class CompanyController {
         try {
             const { company,country } = req.body
             const { id } = req.params
-            const { filename } = req.file;
+            let image;
+            if(req.file){
+                const { filename } = req.file;
+                image=filename
+            }
 
             // old image delete
             const oldData = await AppDataSource.getRepository(CompanyEntity).findOne({ where: { id: +id } })
-            if(oldData){
+            if(oldData && image){
                 const imageToDelete = oldData?.image;
                 const imagePath = path.join(process.cwd(), 'uploads', imageToDelete);
                 fs.unlinkSync(imagePath);
@@ -61,19 +67,15 @@ class CompanyController {
                 console.log("xato");
             }
 
-            // new image 
-            const image = filename
+            oldData.company = company != undefined ? company : oldData.company
+            oldData.country = country != undefined ? country : oldData.country
+            oldData.image = image != undefined ? image : oldData.image
 
-            const companies = await AppDataSource.getRepository(CompanyEntity).createQueryBuilder().update(CompanyEntity)
-                .set({ company,country, image })
-                .where({ id })
-                .returning("*")
-                .execute()
-
+            await AppDataSource.manager.save(oldData)
             res.json({
                 status: 200,
                 message: "companies updated",
-                data: companies.raw[0]
+                data: oldData
             })
         } catch (error) {
             console.log(error);

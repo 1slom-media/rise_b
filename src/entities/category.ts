@@ -1,6 +1,7 @@
 import { IsString } from "class-validator";
 import { Entity, PrimaryGeneratedColumn, Column,CreateDateColumn,UpdateDateColumn, OneToMany, ManyToOne } from "typeorm";
 import { SubCategoryEntity } from "./sub_category";
+import { ProductsEntity } from "./products";
 
 
 @Entity({ name: "category" })
@@ -36,4 +37,7 @@ export class CategoryEntity {
 
     @OneToMany(() => SubCategoryEntity, (sub_category) => sub_category.category)
     sub_category: SubCategoryEntity[]
+
+    @OneToMany(() => ProductsEntity, (products) => products.category)
+    products: ProductsEntity[]
 }

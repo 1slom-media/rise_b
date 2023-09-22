@@ -3,26 +3,34 @@ import { Entity, PrimaryGeneratedColumn, Column,CreateDateColumn,UpdateDateColum
 import { ProductsEntity } from "./products";
 
 
-@Entity({ name: "brand" })
-export class BrandEntity {
+@Entity({ name: "parametrs" })
+export class ParametrsEntity {
     @PrimaryGeneratedColumn()
     id: number
 
     @Column({ type: "varchar"})
     @IsString()
-    brand_uz: string
+    color: string
+
+    @Column({ type: "text"})
+    @IsString()
+    image1: string
+
+    @Column({ type: "text"})
+    @IsString()
+    image2: string
+
+    @Column({ type: "text"})
+    @IsString()
+    image3: string
+
+    @Column({ type: "text"})
+    @IsString()
+    image4: string
 
     @Column({ type: "varchar"})
     @IsString()
-    brand_en: string
-
-    @Column({ type: "varchar"})
-    @IsString()
-    brand_ru: string
-
-    @Column({ type: "varchar"})
-    @IsString()
-    brand_tr: string
+    count: string
 
     @CreateDateColumn({ type: "timestamp" })
     createdAt: Date;
@@ -30,6 +38,6 @@ export class BrandEntity {
     @UpdateDateColumn({ type: "timestamp" })
     updateAt: Date;
 
-    @OneToMany(() => ProductsEntity, (products) => products.brand)
-    products: ProductsEntity[]
+    @ManyToOne(() => ProductsEntity, (products) => products.parametrs)
+    products: ProductsEntity
 }

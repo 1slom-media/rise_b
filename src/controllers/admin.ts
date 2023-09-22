@@ -94,12 +94,16 @@ class StaffController {
         try {
             let { name, surname, phone, email, password, role, company } = req.body
             const { id } = req.params
-            const { filename } = req.file;
+            let image;
+            if(req.file){
+                const { filename } = req.file;
+                image=filename
+            }
             password = await hashed(password);
 
             // old image delete
             const oldData = await AppDataSource.getRepository(AdminEntity).findOne({ where: { id: +id } })
-            if (oldData) {
+            if (oldData && image) {
                 const imageToDelete = oldData?.image;
                 const imagePath = path.join(process.cwd(), 'uploads', imageToDelete);
                 fs.unlinkSync(imagePath);
@@ -107,19 +111,21 @@ class StaffController {
                 console.log("xato");
             }
 
-            // new image 
-            const image = filename
+            oldData.email = email != undefined ? email : oldData.email
+            oldData.role = role != undefined ? role : oldData.role
+            oldData.image = image != undefined ? image : oldData.image
+            oldData.company = company != undefined ? company : oldData.company
+            oldData.phone = phone != undefined ? phone : oldData.phone
+            oldData.password = password != undefined ? password : oldData.password
+            oldData.name = name != undefined ? name : oldData.name
+            oldData.surname = surname != undefined ? surname : oldData.surname
 
-            const admin = await AppDataSource.getRepository(AdminEntity).createQueryBuilder().update(AdminEntity)
-                .set({ name, surname, phone, email, password, role, company, image })
-                .where({ id })
-                .returning("*")
-                .execute()
+            await AppDataSource.manager.save(oldData)
 
             res.json({
                 status: 200,
                 message: "admin updated",
-                data: admin.raw[0]
+                data: oldData
             })
         } catch (error) {
             console.log(error);

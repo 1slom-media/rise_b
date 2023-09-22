@@ -47,31 +47,33 @@ class CountryController {
         try {
             const { country_uz, country_en, country_ru, country_tr } = req.body
             const { id } = req.params
-            const { filename } = req.file;
+            let image;
+            if(req.file){
+                const { filename } = req.file;
+                image=filename
+            }
 
             // old image delete
             const oldData = await AppDataSource.getRepository(CountryEntity).findOne({ where: { id: +id } })
-            if(oldData){
+            if (oldData && image) {
                 const imageToDelete = oldData?.image;
                 const imagePath = path.join(process.cwd(), 'uploads', imageToDelete);
                 fs.unlinkSync(imagePath);
-            }else{
+            } else {
                 console.log("xato");
             }
 
-            // new image 
-            const image = filename
+            oldData.country_uz = country_uz != undefined ? country_uz : oldData.country_uz
+            oldData.country_en = country_en != undefined ? country_en : oldData.country_en
+            oldData.country_ru = country_ru != undefined ? country_ru : oldData.country_ru
+            oldData.country_tr = country_tr != undefined ? country_tr : oldData.country_tr
+            oldData.image = image != undefined ? image : oldData.image
 
-            const country = await AppDataSource.getRepository(CountryEntity).createQueryBuilder().update(CountryEntity)
-                .set({ country_uz, country_en, country_ru, country_tr, image })
-                .where({ id })
-                .returning("*")
-                .execute()
-
+            await AppDataSource.manager.save(oldData)
             res.json({
                 status: 200,
                 message: "country updated",
-                data: country.raw[0]
+                data: oldData
             })
         } catch (error) {
             console.log(error);
@@ -83,11 +85,11 @@ class CountryController {
             const { id } = req.params
 
             const oldData = await AppDataSource.getRepository(CountryEntity).findOne({ where: { id: +id } })
-            if(oldData){
+            if (oldData) {
                 const imageToDelete = oldData?.image;
                 const imagePath = path.join(process.cwd(), 'uploads', imageToDelete);
                 fs.unlinkSync(imagePath);
-            }else{
+            } else {
                 console.log("xato");
             }
             const country = await AppDataSource.getRepository(CountryEntity).createQueryBuilder().delete().from(CountryEntity).where({ id }).returning("*").execute()

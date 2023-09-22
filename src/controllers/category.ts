@@ -8,7 +8,8 @@ class CategoryController {
     public async Get(req: Request, res: Response): Promise<void> {
         res.json(await AppDataSource.getRepository(CategoryEntity).find({
             relations: {
-                sub_category: true
+                sub_category: true,
+                products: true
             }
         }));
     }
@@ -18,7 +19,8 @@ class CategoryController {
 
         res.json(await AppDataSource.getRepository(CategoryEntity).find({
             where: { id: +id }, relations: {
-                sub_category: true
+                sub_category: true,
+                products: true
             }
         }));
     }
@@ -46,11 +48,15 @@ class CategoryController {
         try {
             const { category_uz, category_en, category_ru, category_tr } = req.body
             const { id } = req.params
-            const { filename } = req.file;
+            let image;
+            if(req.file){
+                const { filename } = req.file;
+                image=filename
+            }
 
             // old image delete
             const oldData = await AppDataSource.getRepository(CategoryEntity).findOne({ where: { id: +id } })
-            if (oldData) {
+            if (oldData && image!=undefined) {
                 const imageToDelete = oldData?.image;
                 const imagePath = path.join(process.cwd(), 'uploads', imageToDelete);
                 fs.unlinkSync(imagePath);
@@ -58,19 +64,18 @@ class CategoryController {
                 console.log("xato");
             }
 
-            // new image 
-            const image = filename
+            oldData.category_uz = category_uz != undefined ? category_uz : oldData.category_uz
+            oldData.category_en = category_en != undefined ? category_en : oldData.category_en
+            oldData.category_ru = category_ru != undefined ? category_ru : oldData.category_ru
+            oldData.category_tr = category_tr != undefined ? category_tr : oldData.category_tr
+            oldData.image = image != undefined ? image : oldData.image
 
-            const category = await AppDataSource.getRepository(CategoryEntity).createQueryBuilder().update(CategoryEntity)
-                .set({ category_uz, category_en, category_ru, category_tr, image })
-                .where({ id })
-                .returning("*")
-                .execute()
+            await AppDataSource.manager.save(oldData)
 
             res.json({
                 status: 200,
                 message: "category updated",
-                data: category.raw[0]
+                data: oldData
             })
         } catch (error) {
             console.log(error);

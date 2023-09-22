@@ -40,16 +40,16 @@ class SizeController {
             const { size, sub_category } = req.body
             const { id } = req.params
 
-            const sizes = await AppDataSource.getRepository(SizeEntity).createQueryBuilder().update(SizeEntity)
-                .set({ size, sub_category })
-                .where({ id })
-                .returning("*")
-                .execute()
+            const sizes = await AppDataSource.getRepository(SizeEntity).findOneBy({ id: +id })
 
+            sizes.size = size != undefined ? size : sizes.size
+            sizes.sub_category = sub_category != undefined ? sub_category : sizes.sub_category
+
+            await AppDataSource.manager.save(sizes)
             res.json({
                 status: 200,
                 message: "sizes updated",
-                data: sizes.raw[0]
+                data: sizes
             })
         } catch (error) {
             console.log(error);
@@ -73,4 +73,4 @@ class SizeController {
     }
 }
 
-export default new SizeController();
+export default new SizeController(); 
