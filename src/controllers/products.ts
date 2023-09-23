@@ -10,7 +10,8 @@ class ProductsController {
                 sub_category:true,
                 company:true,
                 brand:true,
-                parametrs:true
+                parametrs:true,
+                charactics:true
             }, order: { id: "ASC" }
         }));
     }
@@ -24,15 +25,16 @@ class ProductsController {
                 sub_category:true,
                 company:true,
                 brand:true,
-                parametrs:true
+                parametrs:true,
+                charactics:true
             }, where: { id: +id }
         }));
     }
 
     public async Post(req: Request, res: Response) {
-        const { name_uz, name_en, name_ru,name_tr,description_uz,description_en,description_ru,description_tr,delivery_uz,delivery_en,delivery_ru,delivery_tr,charactic_uz,charactic_en,charactic_ru,charactic_tr,size,category,sub_category,company,brand } = req.body
+        const { name_uz, name_en, name_ru,name_tr,description_uz,description_en,description_ru,description_tr,delivery_uz,delivery_en,delivery_ru,delivery_tr,size,category,sub_category,company,brand } = req.body
 
-        const products = await AppDataSource.getRepository(ProductsEntity).createQueryBuilder().insert().into(ProductsEntity).values({ name_uz, name_en, name_ru,name_tr,description_uz,description_en,description_ru,description_tr,delivery_uz,delivery_en,delivery_ru,delivery_tr,charactic_uz,charactic_en,charactic_ru,charactic_tr,size,category,sub_category,company,brand  }).returning("*").execute()
+        const products = await AppDataSource.getRepository(ProductsEntity).createQueryBuilder().insert().into(ProductsEntity).values({ name_uz, name_en, name_ru,name_tr,description_uz,description_en,description_ru,description_tr,delivery_uz,delivery_en,delivery_ru,delivery_tr,size,category,sub_category,company,brand  }).returning("*").execute()
 
         res.json({
             status: 201,
@@ -43,7 +45,7 @@ class ProductsController {
 
     public async Put(req: Request, res: Response) {
         try {
-            const { name_uz, name_en, name_ru,name_tr,description_uz,description_en,description_ru,description_tr,delivery_uz,delivery_en,delivery_ru,delivery_tr,charactic_uz,charactic_en,charactic_ru,charactic_tr,size,category,sub_category,company,brand  } = req.body
+            const { name_uz, name_en, name_ru,name_tr,description_uz,description_en,description_ru,description_tr,delivery_uz,delivery_en,delivery_ru,delivery_tr,size,category,sub_category,company,brand  } = req.body
             const { id } = req.params
 
             const products = await AppDataSource.getRepository(ProductsEntity).findOneBy({ id: +id })
@@ -60,10 +62,6 @@ class ProductsController {
             products.delivery_en = delivery_en != undefined ? delivery_en : products.delivery_en
             products.delivery_ru = delivery_ru != undefined ? delivery_ru : products.delivery_ru
             products.delivery_tr = delivery_tr != undefined ? delivery_tr : products.delivery_tr
-            products.charactic_uz = charactic_uz != undefined ? charactic_uz : products.charactic_uz
-            products.charactic_en = charactic_en != undefined ? charactic_en : products.charactic_en
-            products.charactic_ru = charactic_ru != undefined ? charactic_ru : products.charactic_ru
-            products.charactic_tr = charactic_tr != undefined ? charactic_tr : products.charactic_tr
             products.category = category != undefined ? category : products.category
             products.sub_category = sub_category != undefined ? sub_category : products.sub_category
             products.brand = brand != undefined ? brand : products.brand

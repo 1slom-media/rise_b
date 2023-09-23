@@ -5,6 +5,8 @@ import { SubCategoryEntity } from "./sub_category";
 import { BrandEntity } from "./brand";
 import { CompanyEntity } from "./company";
 import { ParametrsEntity } from "./parametrs";
+import { PricesEntity } from "./prices";
+import { CharacticsEntity } from "./charactics";
 
 
 @Entity({ name: "products" })
@@ -55,18 +57,6 @@ export class ProductsEntity {
     @Column({ type: "varchar" })
     delivery_tr: string
 
-    @Column({ type: "varchar" })
-    charactic_uz: string
-
-    @Column({ type: "varchar" })
-    charactic_en: string
-
-    @Column({ type: "varchar" })
-    charactic_ru: string
-
-    @Column({ type: "varchar" })
-    charactic_tr: string
-
     @CreateDateColumn({ type: "timestamp" })
     createdAt: Date;
 
@@ -87,4 +77,10 @@ export class ProductsEntity {
 
     @OneToMany(() => ParametrsEntity, (parametrs) => parametrs.products)
     parametrs: ParametrsEntity[]
+
+    @OneToMany(() => PricesEntity, (prices) => prices.products)
+    prices: PricesEntity[]
+
+    @OneToMany(() => CharacticsEntity, (charactics) => charactics.products)
+    charactics: CharacticsEntity[]
 } 

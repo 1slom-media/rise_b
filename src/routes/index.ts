@@ -12,6 +12,8 @@ import cards from "../controllers/cards";
 import size from "../controllers/size";
 import products from "../controllers/products";
 import parametrs from "../controllers/parametrs";
+import prices from "../controllers/prices";
+import charactics from "../controllers/charactics";
 
 const router = Router()
 
@@ -91,6 +93,20 @@ router.get("/products/:id", products.GetId);
 router.post("/products", checkToken, products.Post);
 router.put("/products/:id", checkToken, products.Put);
 router.delete("/products/:id", checkToken, products.Delete);
+
+// route prices
+router.get("/prices", prices.Get);
+router.get("/prices/:id", prices.GetId);
+router.post("/prices", checkToken, prices.Post);
+router.put("/prices/:id", checkToken, prices.Put);
+router.delete("/prices/:id", checkToken, prices.Delete);
+
+// route charactics
+router.get("/charactics", charactics.Get);
+router.get("/charactics/:id", charactics.GetId);
+router.post("/charactics", checkToken, charactics.Post);
+router.put("/charactics/:id", checkToken, charactics.Put);
+router.delete("/charactics/:id", checkToken, charactics.Delete);
 
 // route parametrs
 router.get("/parametrs", parametrs.Get);

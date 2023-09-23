@@ -11,6 +11,8 @@ import { CardsEntity } from "./entities/cards"
 import { SizeEntity } from "./entities/size"
 import { ProductsEntity } from "./entities/products"
 import { ParametrsEntity } from "./entities/parametrs"
+import { PricesEntity } from "./entities/prices"
+import { CharacticsEntity } from "./entities/charactics"
 
 export const AppDataSource = new DataSource({
     type: "postgres",
@@ -21,7 +23,7 @@ export const AppDataSource = new DataSource({
     database: "rise_b",
     synchronize: true,
     logging: false,
-    entities: [UsersEntity,CountryEntity,AdminEntity,CategoryEntity,CompanyEntity,SubCategoryEntity,BrandEntity,CardsEntity,SizeEntity,ProductsEntity,ParametrsEntity],
+    entities: [UsersEntity,CountryEntity,AdminEntity,CategoryEntity,CompanyEntity,SubCategoryEntity,BrandEntity,CardsEntity,SizeEntity,ProductsEntity,ParametrsEntity,PricesEntity,CharacticsEntity],
     migrations: [],
     subscribers: [],
 })
