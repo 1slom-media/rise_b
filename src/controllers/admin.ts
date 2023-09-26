@@ -111,14 +111,14 @@ class StaffController {
                 console.log("xato");
             }
 
-            oldData.email = email != undefined ? email : oldData.email
-            oldData.role = role != undefined ? role : oldData.role
+            oldData.email = email != "" ? email : oldData.email
+            oldData.role = role != "" ? role : oldData.role
             oldData.image = image != undefined ? image : oldData.image
-            oldData.company = company != undefined ? company : oldData.company
-            oldData.phone = phone != undefined ? phone : oldData.phone
-            oldData.password = password != undefined ? password : oldData.password
-            oldData.name = name != undefined ? name : oldData.name
-            oldData.surname = surname != undefined ? surname : oldData.surname
+            oldData.company = company != "" ? company : oldData.company
+            oldData.phone = phone != "" ? phone : oldData.phone
+            oldData.password = password != "" ? password : oldData.password
+            oldData.name = name != "" ? name : oldData.name
+            oldData.surname = surname != "" ? surname : oldData.surname
 
             await AppDataSource.manager.save(oldData)
 

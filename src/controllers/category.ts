@@ -64,10 +64,10 @@ class CategoryController {
                 console.log("xato");
             }
 
-            oldData.category_uz = category_uz != undefined ? category_uz : oldData.category_uz
-            oldData.category_en = category_en != undefined ? category_en : oldData.category_en
-            oldData.category_ru = category_ru != undefined ? category_ru : oldData.category_ru
-            oldData.category_tr = category_tr != undefined ? category_tr : oldData.category_tr
+            oldData.category_uz = category_uz != "" ? category_uz : oldData.category_uz
+            oldData.category_en = category_en != "" ? category_en : oldData.category_en
+            oldData.category_ru = category_ru != "" ? category_ru : oldData.category_ru
+            oldData.category_tr = category_tr != "" ? category_tr : oldData.category_tr
             oldData.image = image != undefined ? image : oldData.image
 
             await AppDataSource.manager.save(oldData)

@@ -13,14 +13,16 @@ import { ProductsEntity } from "./entities/products"
 import { ParametrsEntity } from "./entities/parametrs"
 import { PricesEntity } from "./entities/prices"
 import { CharacticsEntity } from "./entities/charactics"
+import dotenv from 'dotenv'
+dotenv.config()
 
 export const AppDataSource = new DataSource({
     type: "postgres",
-    host: "localhost",
-    port: 5432,
-    username: "postgres",
-    password: "j8M*.a:gQwyV5G",
-    database: "rise_b",
+    host: process.env.PG_HOST,
+    port: Number(process.env.PG_PORT),
+    username: process.env.PG_USER,
+    password: process.env.PG_PASSWORD,
+    database: process.env.PG_DATABASE,
     synchronize: true,
     logging: false,
     entities: [UsersEntity,CountryEntity,AdminEntity,CategoryEntity,CompanyEntity,SubCategoryEntity,BrandEntity,CardsEntity,SizeEntity,ProductsEntity,ParametrsEntity,PricesEntity,CharacticsEntity],

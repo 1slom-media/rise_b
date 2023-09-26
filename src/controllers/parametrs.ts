@@ -63,7 +63,7 @@ class ParametrsController {
             const { image1, image2, image3, image4 } = req.files as { [fieldname: string]: Express.Multer.File[] };
 
             // old image delete
-            const oldData = await AppDataSource.getRepository(ParametrsEntity).findOne({ where: { id: +id } })
+            const oldData = await AppDataSource.getRepository(ParametrsEntity).findOne({ where: { id: +id },relations:{products:true} })
             if (oldData) {
                 const imageFields = ['image1', 'image2', 'image3', 'image4'];
                 const imageFilenames = [image1, image2, image3, image4].map((image) => image ? image[0]?.filename : undefined);
@@ -87,15 +87,14 @@ class ParametrsController {
 
             // new image 
 
-
-            oldData.color = color != undefined ? color : oldData.color
-            oldData.count = count != undefined ? count : oldData.count
-            oldData.products = products != undefined ? products : oldData.products
+            oldData.color = color != "" ? color : oldData.color;
+            oldData.count = count != "" ? count : oldData.count;
+            oldData.products = products != "" ? products : oldData?.products.id;
             oldData.image1 = image1 != undefined ? image1[0]?.filename : oldData.image1
             oldData.image2 = image2 != undefined ? image2[0]?.filename : oldData.image2
             oldData.image3 = image3 != undefined ? image3[0]?.filename : oldData.image3
             oldData.image4 = image4 != undefined ? image4[0]?.filename : oldData.image4
-
+            
             await AppDataSource.manager.save(oldData)
 
             res.json({

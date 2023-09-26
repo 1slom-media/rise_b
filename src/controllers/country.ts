@@ -63,10 +63,10 @@ class CountryController {
                 console.log("xato");
             }
 
-            oldData.country_uz = country_uz != undefined ? country_uz : oldData.country_uz
-            oldData.country_en = country_en != undefined ? country_en : oldData.country_en
-            oldData.country_ru = country_ru != undefined ? country_ru : oldData.country_ru
-            oldData.country_tr = country_tr != undefined ? country_tr : oldData.country_tr
+            oldData.country_uz = country_uz != "" ? country_uz : oldData.country_uz
+            oldData.country_en = country_en != "" ? country_en : oldData.country_en
+            oldData.country_ru = country_ru != "" ? country_ru : oldData.country_ru
+            oldData.country_tr = country_tr != "" ? country_tr : oldData.country_tr
             oldData.image = image != undefined ? image : oldData.image
 
             await AppDataSource.manager.save(oldData)

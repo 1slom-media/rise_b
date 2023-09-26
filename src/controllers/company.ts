@@ -67,8 +67,8 @@ class CompanyController {
                 console.log("xato");
             }
 
-            oldData.company = company != undefined ? company : oldData.company
-            oldData.country = country != undefined ? country : oldData.country
+            oldData.company = company != "" ? company : oldData.company
+            oldData.country = country != "" ? country : oldData.country
             oldData.image = image != undefined ? image : oldData.image
 
             await AppDataSource.manager.save(oldData)

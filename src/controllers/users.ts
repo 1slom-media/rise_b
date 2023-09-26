@@ -8,6 +8,7 @@ import { hashed } from '../utils/hashed';
 import { UsersEntity } from '../entities/users';
 import Mail from '../utils/nodemailer';
 import passport from '../utils/gf';
+import sms from '../utils/sms';
 
 class UsersController {
     // get all
@@ -78,6 +79,125 @@ class UsersController {
         passport.authenticate('facebook', async(err, user) => {
             res.send('logged in to facebook');
         })(req, res);
+    }
+
+    // signup phone
+    public async SignUpPhone(req: Request, res: Response) {
+        const { phone } = req.body
+
+        const foundUser = await AppDataSource.getRepository(UsersEntity).find({
+            where: { phone }
+        })
+
+        const User = await AppDataSource.getRepository(UsersEntity).findOne({
+            where: { phone }
+        })
+
+        if (!foundUser.length) {
+            const user = await AppDataSource.getRepository(UsersEntity).createQueryBuilder().insert().into(UsersEntity).values({ phone }).returning("*").execute()
+            const code = randomNum();
+            redis.set(phone, code, 'EX', 120);
+            sms.send(phone,`Welcome ! We appreciate your interest in our service. Your Rise verification code ✔:${code}`)
+            return res.json({
+                status: 201,
+                message: "your code sent",
+                data: user.raw[0]
+            })
+        } if (foundUser.length && User?.verify === false) {
+            const code = randomNum();
+            redis.set(phone, code, 'EX', 120);
+            sms.send(phone,`Welcome ! We appreciate your interest in our service. Your Rise verification code ✔:${code}`)
+            return res.json({
+                status: 201,
+                message: "your code sent"
+            })
+        } else {
+            return res.json({ status: 400, message: 'Phone is unique!? This phone has already been registered' })
+        }
+
+    }
+
+    // verify phone
+    public async VerifyPhone(req: Request, res: Response) {
+        const { phone, code } = req.body
+
+        const foundUser = await AppDataSource.getRepository(UsersEntity).findOne({
+            where: { phone }
+        })
+
+        if (foundUser) {
+            const redisCode = await redis.get(phone)
+            if (redisCode && redisCode == code) {
+                foundUser.verify = true
+                await AppDataSource.manager.save(foundUser)
+
+                return res
+                    .status(200)
+                    .json({
+                        status: 200,
+                        message: 'Congratulations, you have successfully registered',
+                        token: sign({ id: foundUser.id }),
+                        user: foundUser
+                    });
+            } else {
+                return res.status(400).json({ status: 400, message: 'Invalid code' });
+            }
+        } else {
+            res.json({ status: 400, message: 'Phone not found' })
+        }
+
+    }
+
+    // resend phone
+    public async ResendCodePhone(req: Request, res: Response) {
+        const { phone } = req.body
+
+        const foundUser = await AppDataSource.getRepository(UsersEntity).findOne({
+            where: { phone }
+        })
+        const oldCode = await redis.del(phone);
+        if (foundUser && foundUser.verify === false) {
+            const code = randomNum();
+            redis.set(phone, code, 'EX', 120);
+            sms.send(phone,`Welcome ! We appreciate your interest in our service. Your Rise verification code ✔:${code}`)
+            res.json({
+                status: 201,
+                message: "Your code sent",
+            })
+        } else {
+            res.json({ status: 400, message: 'Your phone is already registered. You can access your account by logging in ' })
+        }
+
+    }
+
+    // sign phone
+    public async SignInPhone(req: Request, res: Response) {
+        try {
+            const { phone, password } = req.body
+
+            const foundUser = await AppDataSource.getRepository(UsersEntity).findOne({
+                where: { phone }
+            })
+
+            if (foundUser && await compare(password, foundUser.password) == true) {
+                return res.json({
+                    status: 200,
+                    message: "User login successful",
+                    token: sign({ id: foundUser.id }),
+                    data: foundUser
+                })
+
+            } else {
+                res.status(401).json({
+                    status: 401,
+                    message: "wrong phone or password",
+                    token: null,
+                })
+            }
+
+        } catch (error) {
+            console.log(error);
+        }
     }
     
     // signup email
