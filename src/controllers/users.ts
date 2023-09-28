@@ -27,6 +27,18 @@ class UsersController {
         }));
     }
 
+    public async Succsess(req: Request, res: Response): Promise<void> {
+        if (req.user) {
+            res.status(200).json({
+                error: false,
+                message: "Successfully Logged In",
+                user: req.user,
+            });
+        } else {
+            res.status(403).json({ error: true, message: "Not Authorized" });
+        }
+    }
+
     public async GoogleAuth(req: Request, res: Response): Promise<void> {
         passport.authenticate('google', { scope: ['email', 'profile'] })(req, res);
     }
@@ -61,6 +73,8 @@ class UsersController {
                     user: newUser.raw[0],
                     token: sign({ id: user.id }),
                 });
+
+                res.redirect("/")
             }
             res.status(200).json({
                 status: 200,
@@ -68,6 +82,8 @@ class UsersController {
                 user: foundUser,
                 token: sign({ id: foundUser[0]?.id }),
             });
+
+            res.redirect("/");
         })(req, res);
     }
 

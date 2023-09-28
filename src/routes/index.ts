@@ -37,6 +37,7 @@ router.post("/resend-email", users.ResendCodeEmail);
 router.post("/resend-phone", users.ResendCodePhone);
 router.put("/users/:id", checkToken, users.Put);
 router.get("/auth/google", users.GoogleAuth);
+router.get("/auth/login/success", users.Succsess);
 router.get("/auth/google/callback", users.GoogleCallback);
 router.get("/auth/facebook", users.FavebookAuth);
 router.get("/auth/facebook/callback", users.FacebookCallback);
