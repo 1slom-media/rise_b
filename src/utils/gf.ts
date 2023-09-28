@@ -8,7 +8,7 @@ const GoogleStrategy = Strategy
 passport.use(new GoogleStrategy({
     clientID: "951048738787-96ge4tf6og746472dgp1aj91qdtmg3kv.apps.googleusercontent.com",
     clientSecret: "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",
-    callbackURL: "http://localhost:3000/auth/google/callback",
+    callbackURL: "https://api.rise-shopping.uz/auth/google/callback",
     passReqToCallback: true,
 },
     function (request: Request, accessToken: string, refreshToken: string, profile: any, done: VerifyCallback) {
