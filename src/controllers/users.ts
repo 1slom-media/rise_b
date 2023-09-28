@@ -65,8 +65,8 @@ class UsersController {
             res.status(200).json({
                 status: 200,
                 message: 'User info from Google',
-                user: user,
-                token: sign({ id: user.id }),
+                user: foundUser,
+                token: sign({ id: foundUser[0]?.id }),
             });
         })(req, res);
     }
