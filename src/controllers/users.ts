@@ -86,6 +86,7 @@ class UsersController {
                 return next(err);
             }
             res.redirect('https://rise-shopping.uz');
+            // res.redirect('http://localhost:3000');
         });
     }
 
@@ -114,6 +115,7 @@ class UsersController {
 
                 // Redirect or respond as needed
                 res.redirect('https://rise-shopping.uz');
+                // res.redirect('http://localhost:3000');
             });
         })(req, res);
     }
