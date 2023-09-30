@@ -18,8 +18,7 @@ app.use(express.json());
 //     })
 // );
 app.use(
-    cors({
-        origin: 'https://rise-shopping.uz', // Allow requests only from this origin
+    cors({ // Allow requests only from this origin
         credentials: true, // Allow credentials (cookies, headers, etc.)
     })
 );
