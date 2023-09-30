@@ -39,20 +39,20 @@ class UsersController {
         }
 
         if (req.user) {
-            const user=req.user as User
-            
-            const {email,firstName,lastName}=user
+            const user = req.user as User
 
-            const foundUser = await AppDataSource.getRepository(UsersEntity).find({
-                where: { email}
+            const { email, firstName, lastName } = user
+
+            const foundUser = await AppDataSource.getRepository(UsersEntity).findOne({
+                where: { email }
             })
 
-            const name=firstName;
-            const surname=lastName;
-            const verify=true
+            const name = firstName;
+            const surname = lastName;
+            const verify = true
 
-            if (!foundUser.length){
-                const newUser = await AppDataSource.getRepository(UsersEntity).createQueryBuilder().insert().into(UsersEntity).values({email,name,surname,verify}).returning("*").execute()
+            if (!foundUser) {
+                const newUser = await AppDataSource.getRepository(UsersEntity).createQueryBuilder().insert().into(UsersEntity).values({ email, name, surname, verify }).returning("*").execute()
 
                 res.status(200).json({
                     status: 200,
@@ -61,14 +61,15 @@ class UsersController {
                     token: sign({ id: newUser.raw[0]?.id }),
                 });
 
+            } else {
+                res.status(200).json({
+                    success: true,
+                    message: 'successful',
+                    user: foundUser,
+                    token: sign({ id: foundUser.id })
+                });
             }
-            
-            res.status(200).json({
-                success: true,
-                message: 'successful',
-                user: foundUser[0],
-                token:sign({id:foundUser[0]?.id})
-            });
+
         }
     }
 
@@ -93,7 +94,7 @@ class UsersController {
     }
 
     public async GoogleCallback(req: Request, res: Response): Promise<void> {
-        passport.authenticate('google', (err, user, info) => {
+        passport.authenticate('google', (err, user: any, info) => {
             if (err) {
                 console.error('Error during Google authentication:', err);
                 return res.status(500).json({ success: false, message: 'Internal server error' });

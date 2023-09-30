@@ -25,7 +25,7 @@ passport.use(new GoogleStrategy({
 passport.use(new FacebookStrategy({
     clientID: '290451870381084',
     clientSecret: '5a9d4a241af60d126ea74de1d48f9361',
-    callbackURL: 'http://localhost:3000/auth/facebook/callback',
+    callbackURL: 'http://localhost:5000/auth/facebook/callback',
     profileFields: ['id', 'displayName']
 },
     function (accessToken: string, refreshToken: string, profile: any, done) {
