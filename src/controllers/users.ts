@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { AppDataSource } from '../data-source';
 import { sign } from '../utils/jwt';
 import { compare } from '../utils/compare';
@@ -11,6 +11,7 @@ import passport from '../utils/gf';
 import sms from '../utils/sms';
 
 class UsersController {
+
     // get all
     public async Get(req: Request, res: Response): Promise<void> {
         res.json(await AppDataSource.getRepository(UsersEntity).find({
@@ -28,38 +29,24 @@ class UsersController {
     }
 
     public async Succsess(req: Request, res: Response): Promise<void> {
-        if (req.user) {
-            res.status(200).json({
-                error: false,
-                message: "Successfully Logged In",
-                user: req.user,
-            });
-        } else {
-            res.status(403).json({ error: true, message: "Not Authorized" });
+        // Assuming your User type is defined like this
+        interface User {
+            email: string;
+            firstName: string;
+            lastName: string;
+            picture: string;
+            accessToken: string;
         }
-    }
 
-    public async GoogleAuth(req: Request, res: Response): Promise<void> {
-        passport.authenticate('google', { scope: ['email', 'profile'] })(req, res);
-    }
-
-    public async GoogleCallback(req: Request, res: Response): Promise<void> {
-        passport.authenticate('google', async(err, user) => {
-            if (err) {
-                // Handle error
-                return res.status(500).json({ message: 'Error authenticating with Google' });
-            }
-    
-            if (!user) {
-                // Handle no user from Google
-                return res.status(404).json({ message: 'No user from Google' });
-            }
-
+        if (req.user) {
+            const user=req.user as User
+            
             const {email,firstName,lastName}=user
 
             const foundUser = await AppDataSource.getRepository(UsersEntity).find({
                 where: { email}
             })
+
             const name=firstName;
             const surname=lastName;
             const verify=true
@@ -71,31 +58,66 @@ class UsersController {
                     status: 200,
                     message: 'User info from Google',
                     user: newUser.raw[0],
-                    token: sign({ id: user.id }),
+                    token: sign({ id: newUser.raw[0]?.id }),
                 });
 
-                res.redirect("/")
             }
+            
             res.status(200).json({
-                status: 200,
-                message: 'User info from Google',
-                user: foundUser,
-                token: sign({ id: foundUser[0]?.id }),
+                success: true,
+                message: 'successful',
+                user: foundUser[0],
+                token:sign({id:foundUser[0]?.id})
             });
+        }
+    }
 
-            res.redirect("/");
+    public async Failed(req: Request, res: Response): Promise<void> {
+        res.status(401).json({
+            success: false,
+            message: 'failure',
+        });
+    }
+
+    public async LogOut(req: Request, res: Response, next: NextFunction): Promise<void> {
+        req.logout(function (err) {
+            if (err) {
+                return next(err);
+            }
+            res.redirect('http://localhost:3000');
+        });
+    }
+
+    public async GoogleAuth(req: Request, res: Response): Promise<void> {
+        passport.authenticate('google', { scope: ['email', 'profile'] })(req, res)
+    }
+
+    public async GoogleCallback(req: Request, res: Response): Promise<void> {
+        passport.authenticate('google', (err, user, info) => {
+            if (err) {
+                console.error('Error during Google authentication:', err);
+                return res.status(500).json({ success: false, message: 'Internal server error' });
+            }
+
+            if (!user) {
+                console.error('Google authentication failed:', info);
+                return res.status(401).json({ success: false, message: 'Authentication failed' });
+            }
+
+            // If authentication is successful, log in the user or redirect as needed
+            req.logIn(user, (loginErr) => {
+                if (loginErr) {
+                    console.error('Error during user login:', loginErr);
+                    return res.status(500).json({ success: false, message: 'Internal server error' });
+                }
+
+                // Redirect or respond as needed
+                res.redirect('http://localhost:3000');
+            });
         })(req, res);
     }
 
-    public async FavebookAuth(req: Request, res: Response): Promise<void> {
-        passport.authenticate('facebook', { scope: ['email'] })(req, res);
-    }
 
-    public async FacebookCallback(req: Request, res: Response): Promise<void> {
-        passport.authenticate('facebook', async(err, user) => {
-            res.send('logged in to facebook');
-        })(req, res);
-    }
 
     // signup phone
     public async SignUpPhone(req: Request, res: Response) {
@@ -113,7 +135,7 @@ class UsersController {
             const user = await AppDataSource.getRepository(UsersEntity).createQueryBuilder().insert().into(UsersEntity).values({ phone }).returning("*").execute()
             const code = randomNum();
             redis.set(phone, code, 'EX', 120);
-            sms.send(phone,`Welcome ! We appreciate your interest in our service. Your Rise verification code ✔:${code}`)
+            sms.send(phone, `Welcome ! We appreciate your interest in our service. Your Rise verification code ✔:${code}`)
             return res.json({
                 status: 201,
                 message: "your code sent",
@@ -122,7 +144,7 @@ class UsersController {
         } if (foundUser.length && User?.verify === false) {
             const code = randomNum();
             redis.set(phone, code, 'EX', 120);
-            sms.send(phone,`Welcome ! We appreciate your interest in our service. Your Rise verification code ✔:${code}`)
+            sms.send(phone, `Welcome ! We appreciate your interest in our service. Your Rise verification code ✔:${code}`)
             return res.json({
                 status: 201,
                 message: "your code sent"
@@ -175,7 +197,7 @@ class UsersController {
         if (foundUser && foundUser.verify === false) {
             const code = randomNum();
             redis.set(phone, code, 'EX', 120);
-            sms.send(phone,`Welcome ! We appreciate your interest in our service. Your Rise verification code ✔:${code}`)
+            sms.send(phone, `Welcome ! We appreciate your interest in our service. Your Rise verification code ✔:${code}`)
             res.json({
                 status: 201,
                 message: "Your code sent",
@@ -215,7 +237,7 @@ class UsersController {
             console.log(error);
         }
     }
-    
+
     // signup email
     public async SignUpEmail(req: Request, res: Response) {
         const { email } = req.body

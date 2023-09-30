@@ -1,7 +1,7 @@
 import { Request } from 'express';
-import passport from 'passport';
+import passport, { use } from 'passport';
 import { Strategy, VerifyCallback } from 'passport-google-oauth20';
-import { Strategy as FacebookStrategy} from 'passport-facebook';
+import { Strategy as FacebookStrategy } from 'passport-facebook';
 
 const GoogleStrategy = Strategy
 
@@ -14,10 +14,10 @@ passport.use(new GoogleStrategy({
     function (request: Request, accessToken: string, refreshToken: string, profile: any, done: VerifyCallback) {
         const { name, emails, photos } = profile
         const user = {
-            email: emails[0].value,
+            email: emails[0]?.value,
             firstName: name.givenName,
             lastName: name.familyName,
-            picture: photos[0].value,
+            picture: photos[0]?.value,
             accessToken
         }
         done(null, user);
@@ -28,7 +28,7 @@ passport.use(new FacebookStrategy({
     callbackURL: 'http://localhost:3000/auth/facebook/callback',
     profileFields: ['id', 'displayName']
 },
-    function (accessToken:string, refreshToken:string, profile:any, done) {
+    function (accessToken: string, refreshToken: string, profile: any, done) {
         // if user exist by id
         // else user ko save krna hai
         // const { name, emails, photos } = profile

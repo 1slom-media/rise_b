@@ -8,15 +8,21 @@ import path from 'path';
 
 const app: Application = express();
 
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT || 5000
 
 app.use(express.json());
-app.use(cors());
+app.use(
+    cors({
+        origin: 'http://localhost:3000', // Allow requests only from this origin
+        credentials: true, // Allow credentials (cookies, headers, etc.)
+    })
+);
+
 app.use(session({ secret: 'cats', resave: false, saveUninitialized: true }));
 app.use(passport.initialize());
 app.use(passport.session());
 AppDataSource.initialize().then((): void => console.log("connected")).catch((err: unknown): void => console.log(err));
-app.use('/static', express.static(path.join(process.cwd(),'uploads')))
+app.use('/static', express.static(path.join(process.cwd(), 'uploads')))
 app.use(router);
 
 app.listen(PORT, (): void => console.log(`http://localhost:${PORT}`));
