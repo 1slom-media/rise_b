@@ -49,9 +49,9 @@ class UsersController {
 
             const name = firstName;
             const surname = lastName;
-            const verify = true
+            const verify = true    
 
-            if (!foundUser) {
+            if (foundUser==null) {
                 const newUser = await AppDataSource.getRepository(UsersEntity).createQueryBuilder().insert().into(UsersEntity).values({ email, name, surname, verify }).returning("*").execute()
 
                 res.status(200).json({
@@ -85,7 +85,7 @@ class UsersController {
             if (err) {
                 return next(err);
             }
-            res.redirect('http://localhost:3000');
+            res.redirect('https://rise-shopping.uz');
         });
     }
 
@@ -113,7 +113,7 @@ class UsersController {
                 }
 
                 // Redirect or respond as needed
-                res.redirect('http://localhost:3000');
+                res.redirect('https://rise-shopping.uz');
             });
         })(req, res);
     }
