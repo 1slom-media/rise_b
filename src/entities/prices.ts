@@ -10,7 +10,11 @@ export class PricesEntity {
 
     @Column({ type: "varchar"})
     @IsString()
-    counts: string
+    min: string
+
+    @Column({ type: "varchar"})
+    @IsString()
+    max: string
 
     @Column({ type: "text"})
     @IsString()

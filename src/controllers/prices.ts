@@ -22,9 +22,9 @@ class PricesController {
     }
 
     public async Post(req: Request, res: Response) {
-        const { counts,price,products } = req.body
+        const { min, max, price, products } = req.body
 
-        const prices = await AppDataSource.getRepository(PricesEntity).createQueryBuilder().insert().into(PricesEntity).values({ counts,price,products }).returning("*").execute()
+        const prices = await AppDataSource.getRepository(PricesEntity).createQueryBuilder().insert().into(PricesEntity).values({ min,max, price, products }).returning("*").execute()
 
         res.json({
             status: 201,
@@ -35,12 +35,13 @@ class PricesController {
 
     public async Put(req: Request, res: Response) {
         try {
-            const { counts,price,products } = req.body
+            const { min,max, price, products } = req.body
             const { id } = req.params
 
             const prices = await AppDataSource.getRepository(PricesEntity).findOneBy({ id: +id })
 
-            prices.counts = counts != undefined ? counts : prices.counts
+            prices.min = min != undefined ? min : prices.min
+            prices.max = max != undefined ? max : prices.max
             prices.price = price != undefined ? price : prices.price
             prices.products = products != undefined ? products : prices.products
 
