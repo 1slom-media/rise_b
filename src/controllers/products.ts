@@ -11,7 +11,8 @@ class ProductsController {
                 company:true,
                 brand:true,
                 parametrs:true,
-                charactics:true
+                charactics:true,
+                prices:true
             }, order: { id: "ASC" }
         }));
     }
