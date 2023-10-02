@@ -4,17 +4,57 @@ import { ProductsEntity } from '../entities/products';
 
 class ProductsController {
     public async Get(req: Request, res: Response): Promise<void> {
-        res.json(await AppDataSource.getRepository(ProductsEntity).find({
-            relations: {
-                category:true,
-                sub_category:true,
-                company:true,
-                brand:true,
-                parametrs:true,
-                charactics:true,
-                prices:true
-            }, order: { id: "ASC" }
-        }));
+        const { brand, category, subcategory,color, size, price } = req.query;
+        let brandIds: number[] = [];
+        let categoryIds: number[] = [];
+        let subcategoryIds: number[] = [];
+    
+        if (brand) {
+            if (Array.isArray(brand)) {
+                brandIds = brand.map(b => parseInt(b));
+            } else if (typeof brand === 'string') {
+                brandIds = brand.split(',').map(b => parseInt(b));
+            } else {
+                brandIds = [+brand];
+            }
+        }
+        if (category) {
+            if (Array.isArray(category)) {
+                categoryIds = category.map(b => parseInt(b));
+            } else if (typeof category === 'string') {
+                categoryIds = category.split(',').map(b => parseInt(b));
+            } else {
+                categoryIds = [+category];
+            }
+        }if (subcategory) {
+            if (Array.isArray(subcategory)) {
+                subcategoryIds = subcategory.map(b => parseInt(b));
+            } else if (typeof subcategory === 'string') {
+                subcategoryIds = subcategory.split(',').map(b => parseInt(b));
+            } else {
+                subcategoryIds = [+subcategory];
+            }
+        }
+    
+        let query = AppDataSource.getRepository(ProductsEntity)
+            .createQueryBuilder('products')
+            .leftJoinAndSelect('products.category', 'category')
+            .leftJoinAndSelect('products.brand', 'brand')
+            .leftJoinAndSelect('products.parametrs', 'parametrs')
+            .leftJoinAndSelect('products.sub_category', 'sub_category')
+            .leftJoinAndSelect('products.prices', 'prices');
+    
+        if (brandIds.length > 0) {
+            query = query.andWhere("brand.id IN (:...brandIds)", { brandIds });
+        }
+        if (categoryIds.length > 0) {
+            query = query.andWhere("category.id IN (:...categoryIds)", { categoryIds });
+        }if (subcategoryIds.length > 0) {
+            query = query.andWhere("sub_category.id IN (:...subcategoryIds)", { subcategoryIds });
+        }
+    
+        const productList = await query.getMany();
+        res.json(productList);
     }
 
     public async GetId(req: Request, res: Response): Promise<void> {
@@ -22,20 +62,20 @@ class ProductsController {
 
         res.json(await AppDataSource.getRepository(ProductsEntity).find({
             relations: {
-                category:true,
-                sub_category:true,
-                company:true,
-                brand:true,
-                parametrs:true,
-                charactics:true
+                category: true,
+                sub_category: true,
+                company: true,
+                brand: true,
+                parametrs: true,
+                charactics: true
             }, where: { id: +id }
         }));
     }
 
     public async Post(req: Request, res: Response) {
-        const { name_uz, name_en, name_ru,name_tr,description_uz,description_en,description_ru,description_tr,delivery_uz,delivery_en,delivery_ru,delivery_tr,size,category,sub_category,company,brand } = req.body
+        const { name_uz, name_en, name_ru, name_tr, description_uz, description_en, description_ru, description_tr, delivery_uz, delivery_en, delivery_ru, delivery_tr, size, category, sub_category, company, brand } = req.body
 
-        const products = await AppDataSource.getRepository(ProductsEntity).createQueryBuilder().insert().into(ProductsEntity).values({ name_uz, name_en, name_ru,name_tr,description_uz,description_en,description_ru,description_tr,delivery_uz,delivery_en,delivery_ru,delivery_tr,size,category,sub_category,company,brand  }).returning("*").execute()
+        const products = await AppDataSource.getRepository(ProductsEntity).createQueryBuilder().insert().into(ProductsEntity).values({ name_uz, name_en, name_ru, name_tr, description_uz, description_en, description_ru, description_tr, delivery_uz, delivery_en, delivery_ru, delivery_tr, size, category, sub_category, company, brand }).returning("*").execute()
 
         res.json({
             status: 201,
@@ -46,7 +86,7 @@ class ProductsController {
 
     public async Put(req: Request, res: Response) {
         try {
-            const { name_uz, name_en, name_ru,name_tr,description_uz,description_en,description_ru,description_tr,delivery_uz,delivery_en,delivery_ru,delivery_tr,size,category,sub_category,company,brand  } = req.body
+            const { name_uz, name_en, name_ru, name_tr, description_uz, description_en, description_ru, description_tr, delivery_uz, delivery_en, delivery_ru, delivery_tr, size, category, sub_category, company, brand } = req.body
             const { id } = req.params
 
             const products = await AppDataSource.getRepository(ProductsEntity).findOneBy({ id: +id })
