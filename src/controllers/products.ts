@@ -4,11 +4,11 @@ import { ProductsEntity } from '../entities/products';
 
 class ProductsController {
     public async Get(req: Request, res: Response): Promise<void> {
-        const { brand, category, subcategory,color, size, price } = req.query;
+        const { brand, category, subcategory, color, size, price } = req.query;
         let brandIds: number[] = [];
         let categoryIds: number[] = [];
         let subcategoryIds: number[] = [];
-    
+
         if (brand) {
             if (Array.isArray(brand)) {
                 brandIds = brand.map(b => parseInt(b));
@@ -26,7 +26,7 @@ class ProductsController {
             } else {
                 categoryIds = [+category];
             }
-        }if (subcategory) {
+        } if (subcategory) {
             if (Array.isArray(subcategory)) {
                 subcategoryIds = subcategory.map(b => parseInt(b));
             } else if (typeof subcategory === 'string') {
@@ -35,24 +35,24 @@ class ProductsController {
                 subcategoryIds = [+subcategory];
             }
         }
-    
+
         let query = AppDataSource.getRepository(ProductsEntity)
             .createQueryBuilder('products')
             .leftJoinAndSelect('products.category', 'category')
             .leftJoinAndSelect('products.brand', 'brand')
             .leftJoinAndSelect('products.parametrs', 'parametrs')
             .leftJoinAndSelect('products.sub_category', 'sub_category')
-            .leftJoinAndSelect('products.prices', 'prices');
-    
+            .leftJoinAndSelect('products.prices', 'prices').leftJoinAndSelect('products.company', 'company').leftJoinAndSelect('products.charactics', 'charactics');
+
         if (brandIds.length > 0) {
             query = query.andWhere("brand.id IN (:...brandIds)", { brandIds });
         }
         if (categoryIds.length > 0) {
             query = query.andWhere("category.id IN (:...categoryIds)", { categoryIds });
-        }if (subcategoryIds.length > 0) {
+        } if (subcategoryIds.length > 0) {
             query = query.andWhere("sub_category.id IN (:...subcategoryIds)", { subcategoryIds });
         }
-    
+
         const productList = await query.getMany();
         res.json(productList);
     }
@@ -67,7 +67,8 @@ class ProductsController {
                 company: true,
                 brand: true,
                 parametrs: true,
-                charactics: true
+                charactics: true,
+                prices: true
             }, where: { id: +id }
         }));
     }
