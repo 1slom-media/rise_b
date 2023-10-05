@@ -1,6 +1,7 @@
 import { IsString } from "class-validator";
 import { Entity, PrimaryGeneratedColumn, Column,CreateDateColumn,UpdateDateColumn, OneToMany, ManyToOne } from "typeorm";
 import { ProductsEntity } from "./products";
+import { CartEntity } from "./cart";
 
 
 @Entity({ name: "parametrs" })
@@ -40,4 +41,7 @@ export class ParametrsEntity {
 
     @ManyToOne(() => ProductsEntity, (products) => products.parametrs)
     products: ProductsEntity
+
+    @OneToMany(() => CartEntity, (cart) => cart.parametrs)
+    cart: CartEntity[]
 }

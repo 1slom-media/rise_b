@@ -1,6 +1,7 @@
 import { IsEmail, IsString } from "class-validator";
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from "typeorm";
 import { CardsEntity } from "./cards";
+import { CartEntity } from "./cart";
 
 
 
@@ -40,4 +41,7 @@ export class UsersEntity {
 
     @OneToMany(() => CardsEntity, (cards) => cards.user)
     cards: CardsEntity[]
+
+    @OneToMany(() => CartEntity, (cart) => cart.user)
+    cart: CartEntity[]
 }

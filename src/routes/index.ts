@@ -14,6 +14,7 @@ import products from "../controllers/products";
 import parametrs from "../controllers/parametrs";
 import prices from "../controllers/prices";
 import charactics from "../controllers/charactics";
+import cart from "../controllers/cart";
 
 const router = Router()
 
@@ -77,6 +78,13 @@ router.get("/brand/:id", brand.GetId);
 router.post("/brand", checkToken, brand.Post);
 router.put("/brand/:id", checkToken, brand.Put);
 router.delete("/brand/:id", checkToken, brand.Delete);
+
+// route cart
+router.get("/cart", cart.Get);
+router.get("/cart/:id", cart.GetId);
+router.post("/cart", checkToken, cart.Post);
+router.put("/cart/:id", checkToken, cart.Put);
+router.delete("/cart/:id", checkToken, cart.Delete);
 
 // route cards
 router.get("/cards", cards.Get);

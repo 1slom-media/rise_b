@@ -138,7 +138,7 @@ class UsersController {
             const user = await AppDataSource.getRepository(UsersEntity).createQueryBuilder().insert().into(UsersEntity).values({ phone }).returning("*").execute()
             const code = randomNum();
             redis.set(phone, code, 'EX', 120);
-            sms.send(phone, `Welcome ! We appreciate your interest in our service. Your Rise verification code ✔:${code}`)
+            sms.send(phone, `Для завершения процедуры регистрации на https://rise-shopping.uz пожалуйста, введите код: ${code}`)
             return res.json({
                 status: 201,
                 message: "your code sent",
@@ -147,7 +147,7 @@ class UsersController {
         } if (foundUser.length && User?.verify === false) {
             const code = randomNum();
             redis.set(phone, code, 'EX', 120);
-            sms.send(phone, `Welcome ! We appreciate your interest in our service. Your Rise verification code ✔:${code}`)
+            sms.send(phone, `Для завершения процедуры регистрации на https://rise-shopping.uz пожалуйста, введите код: ${code}`)
             return res.json({
                 status: 201,
                 message: "your code sent"

@@ -18,9 +18,9 @@ class CardsController {
     }
 
     public async Post(req: Request, res: Response) {
-        const { card_number,month,cvv,user} = req.body
+        const { card_number, month, cvv, user } = req.body
 
-        const cards = await AppDataSource.getRepository(CardsEntity).createQueryBuilder().insert().into(CardsEntity).values({ card_number,month,cvv,user}).returning("*").execute()
+        const cards = await AppDataSource.getRepository(CardsEntity).createQueryBuilder().insert().into(CardsEntity).values({ card_number, month, cvv, user }).returning("*").execute()
 
         res.json({
             status: 201,
@@ -31,11 +31,11 @@ class CardsController {
 
     public async Put(req: Request, res: Response) {
         try {
-            const { card_number,month,cvv,user} = req.body
+            const { card_number, month, cvv, user } = req.body
             const { id } = req.params
 
             const cards = await AppDataSource.getRepository(CardsEntity).createQueryBuilder().update(CardsEntity)
-                .set({ card_number,month,cvv,user})
+                .set({ card_number, month, cvv, user })
                 .where({ id })
                 .returning("*")
                 .execute()

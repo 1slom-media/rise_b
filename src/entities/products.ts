@@ -7,6 +7,7 @@ import { CompanyEntity } from "./company";
 import { ParametrsEntity } from "./parametrs";
 import { PricesEntity } from "./prices";
 import { CharacticsEntity } from "./charactics";
+import { CartEntity } from "./cart";
 
 
 @Entity({ name: "products" })
@@ -83,4 +84,7 @@ export class ProductsEntity {
 
     @OneToMany(() => CharacticsEntity, (charactics) => charactics.products)
     charactics: CharacticsEntity[]
+
+    @OneToMany(() => CartEntity, (cart) => cart.products)
+    cart: CartEntity[]
 } 
