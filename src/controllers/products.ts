@@ -42,7 +42,7 @@ class ProductsController {
             .leftJoinAndSelect('products.brand', 'brand')
             .leftJoinAndSelect('products.parametrs', 'parametrs')
             .leftJoinAndSelect('products.sub_category', 'sub_category')
-            .leftJoinAndSelect('products.prices', 'prices').leftJoinAndSelect('products.company', 'company').leftJoinAndSelect('products.charactics', 'charactics');
+            .leftJoinAndSelect('products.prices', 'prices').leftJoinAndSelect('products.company', 'company').leftJoinAndSelect('products.charactics', 'charactics').leftJoinAndSelect('products.cart', 'cart');
 
         if (brandIds.length > 0) {
             query = query.andWhere("brand.id IN (:...brandIds)", { brandIds });
@@ -68,7 +68,8 @@ class ProductsController {
                 brand: true,
                 parametrs: true,
                 charactics: true,
-                prices: true
+                prices: true,
+                cart:true
             }, where: { id: +id }
         }));
     }

@@ -15,7 +15,10 @@ class UsersController {
     // get all
     public async Get(req: Request, res: Response): Promise<void> {
         res.json(await AppDataSource.getRepository(UsersEntity).find({
-            order: { id: "ASC" }
+            order: { id: "ASC" },relations:{
+                cards:true,
+                cart:true
+            }
         }));
     }
 
@@ -24,7 +27,10 @@ class UsersController {
         const { id } = req.params
 
         res.json(await AppDataSource.getRepository(UsersEntity).find({
-            where: { id: +id }
+            where: { id: +id },relations:{
+                cart:true,
+                cards:true
+            }
         }));
     }
 

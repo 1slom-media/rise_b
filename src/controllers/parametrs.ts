@@ -8,7 +8,8 @@ class ParametrsController {
     public async Get(req: Request, res: Response): Promise<void> {
         res.json(await AppDataSource.getRepository(ParametrsEntity).find({
             relations: {
-                products: true
+                products: true,
+                cart:true
             }
         }));
     }
@@ -18,7 +19,8 @@ class ParametrsController {
 
         res.json(await AppDataSource.getRepository(ParametrsEntity).find({
             where: { id: +id }, relations: {
-                products: true
+                products: true,
+                cart:true
             }
         }));
     }
