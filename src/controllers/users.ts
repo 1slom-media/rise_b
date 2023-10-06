@@ -15,9 +15,9 @@ class UsersController {
     // get all
     public async Get(req: Request, res: Response): Promise<void> {
         res.json(await AppDataSource.getRepository(UsersEntity).find({
-            order: { id: "ASC" },relations:{
-                cards:true,
-                cart:true
+            order: { id: "ASC" }, relations: {
+                cards: true,
+                cart: true
             }
         }));
     }
@@ -27,9 +27,9 @@ class UsersController {
         const { id } = req.params
 
         res.json(await AppDataSource.getRepository(UsersEntity).find({
-            where: { id: +id },relations:{
-                cart:true,
-                cards:true
+            where: { id: +id }, relations: {
+                cart: true,
+                cards: true
             }
         }));
     }
@@ -55,9 +55,9 @@ class UsersController {
 
             const name = firstName;
             const surname = lastName;
-            const verify = true    
+            const verify = true
 
-            if (foundUser==null) {
+            if (foundUser == null) {
                 const newUser = await AppDataSource.getRepository(UsersEntity).createQueryBuilder().insert().into(UsersEntity).values({ email, name, surname, verify }).returning("*").execute()
 
                 res.status(200).json({
@@ -396,10 +396,11 @@ class UsersController {
             const { id } = req.params
             let { email, phone, password, name, surname } = req.body
 
-            password = await hashed(password)
+            if (password) {
+                password = await hashed(password)
+            }
 
             const user = await AppDataSource.getRepository(UsersEntity).findOneBy({ id: +id })
-
 
             user.email = email != undefined ? email : user.email
             user.phone = phone != undefined ? phone : user.phone
@@ -415,28 +416,81 @@ class UsersController {
                 data: user
             })
         } catch (error) {
-            console.log(error);
+            res.json({
+                status: 400,
+                message: error?.message
+            })
         }
     }
 
     // forgot password
     public async ForgotPassword(req: Request, res: Response) {
         try {
-            const { id } = req.params
-
-            const user = await AppDataSource.getRepository(UsersEntity).createQueryBuilder().update(UsersEntity)
-                .set({ password: null, verify: false })
-                .where({ id })
-                .returning("*")
-                .execute()
-
-            res.json({
-                status: 200,
-                message: "user deleted",
-                data: user.raw[0]
+            const { email, phone } = req.body
+            const foundUser = await AppDataSource.getRepository(UsersEntity).find({
+                where: { email }
             })
+
+            const User = await AppDataSource.getRepository(UsersEntity).findOne({
+                where: { email }
+            })
+
+            const UserPhone = await AppDataSource.getRepository(UsersEntity).findOne({
+                where: { phone }
+            })
+
+            const foundUserPhone = await AppDataSource.getRepository(UsersEntity).find({
+                where: { phone }
+            })
+
+            if (email) {
+                const user = await AppDataSource.getRepository(UsersEntity).createQueryBuilder().update(UsersEntity)
+                    .set({ password: null, verify: false })
+                    .where({ email })
+                    .returning("*")
+                    .execute()
+
+                if (foundUser.length && User?.verify === false) {
+                    const code = randomNum();
+                    redis.set(email, code, 'EX', 120);
+                    Mail({
+                        from: {
+                            name: "Rise Development",
+                            address: "islombektagayev1@gmail.com"
+                        }, // sender address
+                        to: email, // list of receivers
+                        subject: `Rise verification code ✔`, // Subject line
+                        html: `Welcome ! We appreciate your interest in our service. Your verification code: <br/> <br/> <b>${code}</b>`, // html body
+                    });
+                    return res.json({
+                        status: 201,
+                        message: "your code sent"
+                    })
+                }
+            }
+
+            if (phone) {
+                const user = await AppDataSource.getRepository(UsersEntity).createQueryBuilder().update(UsersEntity)
+                    .set({ password: null, verify: false })
+                    .where({ phone })
+                    .returning("*")
+                    .execute()
+
+                if (foundUserPhone.length && UserPhone?.verify === false) {
+                    const code = randomNum();
+                    redis.set(phone, code, 'EX', 120);
+                    sms.send(phone, `Для завершения процедуры регистрации на https://rise-shopping.uz пожалуйста, введите код: ${code}`)
+                    return res.json({
+                        status: 201,
+                        message: "your code sent"
+                    })
+                }
+            }
         } catch (error) {
-            console.log(error);
+            res.json({
+                status: 400,
+                message: error.message,
+            })
         }
     }
 
