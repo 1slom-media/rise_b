@@ -32,12 +32,13 @@ class CartController {
     }
 
     public async Post(req: Request, res: Response) {
-        const { quantity, products, indeks, user } = req.body
+        const { quantity, products, indeks, user,price } = req.body
 
         const cart = new CartEntity()
         cart.quantity=quantity
         cart.products=products
         cart.indeks=indeks
+        cart.price=price
         cart.user=user
 
         await AppDataSource.manager.save(cart)
@@ -51,7 +52,7 @@ class CartController {
 
     public async Put(req: Request, res: Response) {
         try {
-            const { quantity, products, indeks, user } = req.body
+            const { quantity, products, indeks, user,price } = req.body
             const { id } = req.params
 
             const cart = await AppDataSource.getRepository(CartEntity).findOne({
@@ -64,6 +65,7 @@ class CartController {
             cart.quantity = quantity != undefined ? quantity : cart.quantity
             cart.products = products != undefined ? products : cart.products.id
             cart.indeks = indeks != undefined ? indeks : cart.indeks
+            cart.price = price != undefined ? price : cart.price
             cart.user = user != undefined ? user : cart.user.id
 
             await AppDataSource.manager.save(cart)

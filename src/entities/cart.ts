@@ -13,6 +13,10 @@ export class CartEntity {
     @IsString()
     quantity: string
 
+    @Column({ type: "varchar" })
+    @IsString()
+    price: string
+
     @Column({ type: "simple-array",nullable:true })
     indeks: object[]
 
