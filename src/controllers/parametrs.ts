@@ -9,7 +9,6 @@ class ParametrsController {
         res.json(await AppDataSource.getRepository(ParametrsEntity).find({
             relations: {
                 products: true,
-                cart:true
             }
         }));
     }
@@ -20,7 +19,6 @@ class ParametrsController {
         res.json(await AppDataSource.getRepository(ParametrsEntity).find({
             where: { id: +id }, relations: {
                 products: true,
-                cart:true
             }
         }));
     }

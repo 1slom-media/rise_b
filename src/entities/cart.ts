@@ -1,8 +1,7 @@
 import { IsString } from "class-validator";
-import { Entity, PrimaryGeneratedColumn, Column,CreateDateColumn,UpdateDateColumn, OneToMany, ManyToOne } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany, ManyToOne } from "typeorm";
 import { ProductsEntity } from "./products";
 import { UsersEntity } from "./users";
-import { ParametrsEntity } from "./parametrs";
 
 
 @Entity({ name: "cart" })
@@ -10,9 +9,12 @@ export class CartEntity {
     @PrimaryGeneratedColumn()
     id: number
 
-    @Column({ type: "varchar"})
+    @Column({ type: "varchar" })
     @IsString()
     quantity: string
+
+    @Column({ type: "simple-array",nullable:true })
+    indeks: object[]
 
     @CreateDateColumn({ type: "timestamp" })
     createdAt: Date;
@@ -25,7 +27,4 @@ export class CartEntity {
 
     @ManyToOne(() => UsersEntity, (users) => users.cart)
     user: UsersEntity
-
-    @ManyToOne(() => ParametrsEntity, (parametrs) => parametrs.cart)
-    parametrs: ParametrsEntity
 }

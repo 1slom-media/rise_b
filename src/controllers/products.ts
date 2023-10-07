@@ -75,9 +75,9 @@ class ProductsController {
     }
 
     public async Post(req: Request, res: Response) {
-        const { name_uz, name_en, name_ru, name_tr, description_uz, description_en, description_ru, description_tr, delivery_uz, delivery_en, delivery_ru, delivery_tr, size, category, sub_category, company, brand } = req.body
+        const { name_uz, name_en, name_ru, name_tr, description_uz, description_en, description_ru, description_tr, delivery_uz, delivery_en, delivery_ru, delivery_tr, size, category, sub_category, company, brand,minimum } = req.body
 
-        const products = await AppDataSource.getRepository(ProductsEntity).createQueryBuilder().insert().into(ProductsEntity).values({ name_uz, name_en, name_ru, name_tr, description_uz, description_en, description_ru, description_tr, delivery_uz, delivery_en, delivery_ru, delivery_tr, size, category, sub_category, company, brand }).returning("*").execute()
+        const products = await AppDataSource.getRepository(ProductsEntity).createQueryBuilder().insert().into(ProductsEntity).values({ name_uz, name_en, name_ru, name_tr, description_uz, description_en, description_ru, description_tr, delivery_uz, delivery_en, delivery_ru, delivery_tr, size, category, sub_category, company, brand,minimum }).returning("*").execute()
 
         res.json({
             status: 201,
@@ -88,7 +88,7 @@ class ProductsController {
 
     public async Put(req: Request, res: Response) {
         try {
-            const { name_uz, name_en, name_ru, name_tr, description_uz, description_en, description_ru, description_tr, delivery_uz, delivery_en, delivery_ru, delivery_tr, size, category, sub_category, company, brand } = req.body
+            const { name_uz, name_en, name_ru, name_tr, description_uz, description_en, description_ru, description_tr, delivery_uz, delivery_en, delivery_ru, delivery_tr, size, category, sub_category, company, brand,minimum } = req.body
             const { id } = req.params
 
             const products = await AppDataSource.getRepository(ProductsEntity).findOneBy({ id: +id })
@@ -110,6 +110,7 @@ class ProductsController {
             products.brand = brand != undefined ? brand : products.brand
             products.company = company != undefined ? company : products.company
             products.size = size != undefined ? size : products.size
+            products.minimum = minimum != undefined ? minimum : products.minimum
 
             await AppDataSource.manager.save(products)
             res.json({

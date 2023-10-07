@@ -34,6 +34,10 @@ export class ProductsEntity {
     @Column({ type: "simple-array",nullable:true})
     size: object[]
 
+    @Column({type:'varchar',nullable:true})
+    @IsString()
+    minimum:string
+
     @Column({ type: "varchar" })
     description_uz: string
 
