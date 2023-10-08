@@ -13,11 +13,15 @@ export class CartEntity {
     @IsString()
     quantity: string
 
-    @Column({ type: "varchar" })
+    @Column({ type: "varchar",nullable:true })
     @IsString()
     price: string
 
-    @Column({ type: "simple-array",nullable:true })
+    @Column({ type: "varchar",nullable:true })
+    @IsString()
+    size: string
+
+    @Column({ type: "jsonb",nullable:true })
     indeks: object[]
 
     @CreateDateColumn({ type: "timestamp" })
