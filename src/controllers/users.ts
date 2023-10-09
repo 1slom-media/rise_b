@@ -184,7 +184,7 @@ class UsersController {
                         status: 200,
                         message: 'Congratulations, you have successfully registered',
                         token: sign({ id: foundUser.id }),
-                        user: foundUser
+                        data: foundUser
                     });
             } else {
                 return res.status(400).json({ status: 400, message: 'Invalid code' });
@@ -319,7 +319,7 @@ class UsersController {
                         status: 200,
                         message: 'Congratulations, you have successfully registered',
                         token: sign({ id: foundUser.id }),
-                        user: foundUser
+                        data: foundUser
                     });
             } else {
                 return res.status(400).json({ status: 400, message: 'Invalid code' });
