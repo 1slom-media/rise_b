@@ -42,7 +42,7 @@ router.get("/auth/login/success", users.Succsess);
 router.get("/auth/login/failed", users.Failed);
 router.get("/auth/logout", users.LogOut);
 router.get("/auth/google/callback", users.GoogleCallback);
-router.post("/forgot-password", checkToken, users.ForgotPassword);
+router.post("/forgot-password",users.ForgotPassword);
 
 // route country
 router.get("/country", country.Get);
