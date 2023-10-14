@@ -63,7 +63,7 @@ class UsersController {
                 res.status(200).json({
                     status: 200,
                     message: 'User info from Google',
-                    user: newUser.raw[0],
+                    data: newUser.raw[0],
                     token: sign({ id: newUser.raw[0]?.id }),
                 });
 
@@ -71,7 +71,7 @@ class UsersController {
                 res.status(200).json({
                     success: true,
                     message: 'successful',
-                    user: foundUser,
+                    data: foundUser,
                     token: sign({ id: foundUser.id })
                 });
             }
@@ -91,12 +91,8 @@ class UsersController {
             if (err) {
                 return next(err);
             }
-            if (req.url == 'http://localhost:3000') {
-
-                res.redirect('http://localhost:3000');
-            } else {
-                res.redirect('https://rise-shopping.uz');
-            }
+            res.redirect('http://localhost:3000');
+            // res.redirect('https://rise-shopping.uz');
         });
     }
 
@@ -124,12 +120,8 @@ class UsersController {
                 }
 
                 // Redirect or respond as needed
-                if (req.url == 'http://localhost:3000') {
-
-                    res.redirect('http://localhost:3000');
-                } else {
-                    res.redirect('https://rise-shopping.uz');
-                }
+                res.redirect('http://localhost:3000');
+                // res.redirect('https://rise-shopping.uz');
             });
         })(req, res);
     }
