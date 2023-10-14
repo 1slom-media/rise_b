@@ -134,7 +134,12 @@ class ProductsController {
 
             const country = foundCompany.country
 
-            const products = await AppDataSource.getRepository(ProductsEntity).findOneBy({ id: +id })
+            const products = await AppDataSource.getRepository(ProductsEntity).findOne({ where:{id:+id},relations:{
+                brand:true,
+                company:true,
+                sub_category:true,
+                category:true
+            } })
 
             products.name_uz = name_uz != undefined ? name_uz : products.name_uz
             products.name_en = name_en != undefined ? name_en : products.name_en
@@ -148,10 +153,10 @@ class ProductsController {
             products.delivery_en = delivery_en != undefined ? delivery_en : products.delivery_en
             products.delivery_ru = delivery_ru != undefined ? delivery_ru : products.delivery_ru
             products.delivery_tr = delivery_tr != undefined ? delivery_tr : products.delivery_tr
-            products.category = category != undefined ? category : products.category
-            products.sub_category = sub_category != undefined ? sub_category : products.sub_category
-            products.brand = brand != undefined ? brand : products.brand
-            products.company = company != undefined ? company : products.company
+            products.category = category != undefined ? category : products.category.id
+            products.sub_category = sub_category != undefined ? sub_category : products.sub_category.id
+            products.brand = brand != undefined ? brand : products.brand.id
+            products.company = company != undefined ? company : products.company.id
             products.size = size != undefined ? size : products.size
             products.minimum = minimum != undefined ? minimum : products.minimum
             products.country = country != undefined ? country : products.country
