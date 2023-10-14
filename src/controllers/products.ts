@@ -126,13 +126,17 @@ class ProductsController {
             const { name_uz, name_en, name_ru, name_tr, description_uz, description_en, description_ru, description_tr, delivery_uz, delivery_en, delivery_ru, delivery_tr, size, category, sub_category, company, brand, minimum } = req.body
             const { id } = req.params
 
-            const foundCompany = await AppDataSource.getRepository(CompanyEntity).findOne({
-                where: { id: +company }, relations: {
-                    country: true
-                }
-            })
+            let country;
 
-            const country = foundCompany.country
+            if(company){
+                const foundCompany = await AppDataSource.getRepository(CompanyEntity).findOne({
+                    where: { id: +company }, relations: {
+                        country: true
+                    }
+                })
+
+                country = foundCompany.country
+            }
 
             const products = await AppDataSource.getRepository(ProductsEntity).findOne({ where:{id:+id},relations:{
                 brand:true,
