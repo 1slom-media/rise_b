@@ -11,17 +11,17 @@ const app: Application = express();
 const PORT = process.env.PORT || 5000
 
 app.use(express.json());
-// app.use(
-//     cors({
-//         origin: 'http://localhost:3000', // Allow requests only from this origin
-//         credentials: true, // Allow credentials (cookies, headers, etc.)
-//     })
-// );
 app.use(
-    cors({ // Allow requests only from this origin
+    cors({
+        origin: ['http://localhost:3000','https://rise-shopping.uz'], // Allow requests only from this origin
         credentials: true, // Allow credentials (cookies, headers, etc.)
     })
 );
+// app.use(
+//     cors({ // Allow requests only from this origin
+//         credentials: true, // Allow credentials (cookies, headers, etc.)
+//     })
+// );
 
 app.use(session({ secret: 'cats', resave: false, saveUninitialized: true }));
 app.use(passport.initialize());
