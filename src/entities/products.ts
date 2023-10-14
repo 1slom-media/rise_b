@@ -8,6 +8,7 @@ import { ParametrsEntity } from "./parametrs";
 import { PricesEntity } from "./prices";
 import { CharacticsEntity } from "./charactics";
 import { CartEntity } from "./cart";
+import { CountryEntity } from "./country";
 
 
 @Entity({ name: "products" })
@@ -31,8 +32,8 @@ export class ProductsEntity {
     @IsString()
     name_tr: string
 
-    @Column({ type: "simple-array",nullable:true})
-    size: object[]
+    @Column({ type: "varchar",array:true,nullable:true})
+    size: string[]
 
     @Column({type:'varchar',nullable:true})
     @IsString()
@@ -68,27 +69,30 @@ export class ProductsEntity {
     @UpdateDateColumn({ type: "timestamp" })
     updateAt: Date;
 
-    @ManyToOne(() => CategoryEntity, (category) => category.products)
+    @ManyToOne(() => CategoryEntity, (category) => category.products,{onDelete:"CASCADE",onUpdate:"CASCADE"})
     category: CategoryEntity
 
-    @ManyToOne(() => SubCategoryEntity, (sub_category) => sub_category.products)
+    @ManyToOne(() => SubCategoryEntity, (sub_category) => sub_category.products,{onDelete:"CASCADE",onUpdate:"CASCADE"})
     sub_category: SubCategoryEntity
 
-    @ManyToOne(() => BrandEntity, (brand) => brand.products)
+    @ManyToOne(() => CountryEntity, (country) => country.products,{onDelete:"CASCADE",onUpdate:"CASCADE"})
+    country: CountryEntity
+
+    @ManyToOne(() => BrandEntity, (brand) => brand.products,{onDelete:"CASCADE",onUpdate:"CASCADE"})
     brand: BrandEntity
 
-    @ManyToOne(() => CompanyEntity, (company) => company.products)
+    @ManyToOne(() => CompanyEntity, (company) => company.products,{onDelete:"CASCADE",onUpdate:"CASCADE"})
     company: CompanyEntity
 
-    @OneToMany(() => ParametrsEntity, (parametrs) => parametrs.products)
+    @OneToMany(() => ParametrsEntity, (parametrs) => parametrs.products,{onDelete:"CASCADE",onUpdate:"CASCADE"})
     parametrs: ParametrsEntity[]
 
-    @OneToMany(() => PricesEntity, (prices) => prices.products)
+    @OneToMany(() => PricesEntity, (prices) => prices.products,{onDelete:"CASCADE",onUpdate:"CASCADE"})
     prices: PricesEntity[]
 
-    @OneToMany(() => CharacticsEntity, (charactics) => charactics.products)
+    @OneToMany(() => CharacticsEntity, (charactics) => charactics.products,{onDelete:"CASCADE",onUpdate:"CASCADE"})
     charactics: CharacticsEntity[]
 
-    @OneToMany(() => CartEntity, (cart) => cart.products)
+    @OneToMany(() => CartEntity, (cart) => cart.products,{onDelete:"CASCADE",onUpdate:"CASCADE"})
     cart: CartEntity[]
 } 

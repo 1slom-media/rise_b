@@ -1,6 +1,7 @@
 import { IsString } from "class-validator";
 import { Entity, PrimaryGeneratedColumn, Column,CreateDateColumn,UpdateDateColumn, OneToMany } from "typeorm";
 import { CompanyEntity } from "./company";
+import { ProductsEntity } from "./products";
 
 
 @Entity({ name: "country" })
@@ -34,6 +35,9 @@ export class CountryEntity {
     @UpdateDateColumn({ type: "timestamp" })
     updateAt: Date;
 
-    @OneToMany(() => CompanyEntity, (company) => company.country)
+    @OneToMany(() => CompanyEntity, (company) => company.country,{onDelete:"CASCADE",onUpdate:"CASCADE"})
     company: CompanyEntity[]
+
+    @OneToMany(() => ProductsEntity, (products) => products.country,{onDelete:"CASCADE",onUpdate:"CASCADE"})
+    products: ProductsEntity[]
 }

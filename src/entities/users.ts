@@ -39,9 +39,9 @@ export class UsersEntity {
     @UpdateDateColumn({ type: "timestamp" })
     updateAt: Date;
 
-    @OneToMany(() => CardsEntity, (cards) => cards.user)
+    @OneToMany(() => CardsEntity, (cards) => cards.user,{onDelete:"CASCADE",onUpdate:"CASCADE"})
     cards: CardsEntity[]
 
-    @OneToMany(() => CartEntity, (cart) => cart.user)
+    @OneToMany(() => CartEntity, (cart) => cart.user,{onDelete:"CASCADE",onUpdate:"CASCADE"})
     cart: CartEntity[]
 }

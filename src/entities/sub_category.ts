@@ -31,12 +31,12 @@ export class SubCategoryEntity {
     @UpdateDateColumn({ type: "timestamp" })
     updateAt: Date;
 
-    @ManyToOne(() => CategoryEntity, (category) => category.sub_category)
+    @ManyToOne(() => CategoryEntity, (category) => category.sub_category,{onDelete:"CASCADE",onUpdate:"CASCADE"})
     category: CategoryEntity
 
-    @OneToMany(() => SizeEntity, (size) => size.sub_category)
+    @OneToMany(() => SizeEntity, (size) => size.sub_category,{onDelete:"CASCADE",onUpdate:"CASCADE"})
     size: SizeEntity[]
 
-    @OneToMany(() => ProductsEntity, (products) => products.sub_category)
+    @OneToMany(() => ProductsEntity, (products) => products.sub_category,{onDelete:"CASCADE",onUpdate:"CASCADE"})
     products: ProductsEntity[]
 }

@@ -18,7 +18,7 @@ export class SizeEntity {
     @UpdateDateColumn({ type: "timestamp" })
     updateAt: Date;
 
-    @ManyToOne(() => SubCategoryEntity, (sub_category) => sub_category.size)
+    @ManyToOne(() => SubCategoryEntity, (sub_category) => sub_category.size,{onDelete:"CASCADE",onUpdate:"CASCADE"})
     sub_category: SubCategoryEntity
 
 }

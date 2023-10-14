@@ -26,6 +26,6 @@ export class CardsEntity {
     @UpdateDateColumn({ type: "timestamp" })
     updateAt: Date;
 
-    @ManyToOne(() => UsersEntity, (user) => user.cards)
+    @ManyToOne(() => UsersEntity, (user) => user.cards,{onDelete:"CASCADE",onUpdate:"CASCADE"})
     user: UsersEntity
 }

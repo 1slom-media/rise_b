@@ -24,12 +24,12 @@ export class CompanyEntity {
     @UpdateDateColumn({ type: "timestamp" })
     updateAt: Date;
 
-    @ManyToOne(() => CountryEntity, (country) => country.company)
+    @ManyToOne(() => CountryEntity, (country) => country.company,{onDelete:"CASCADE",onUpdate:"CASCADE"})
     country: CountryEntity
 
-    @OneToMany(() => AdminEntity, (admin) => admin.company)
+    @OneToMany(() => AdminEntity, (admin) => admin.company,{onDelete:"CASCADE",onUpdate:"CASCADE"})
     admin: AdminEntity[]
 
-    @OneToMany(() => ProductsEntity, (products) => products.company)
+    @OneToMany(() => ProductsEntity, (products) => products.company,{onDelete:"CASCADE",onUpdate:"CASCADE"})
     products: ProductsEntity[]
 }

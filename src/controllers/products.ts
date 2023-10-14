@@ -1,13 +1,15 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../data-source';
 import { ProductsEntity } from '../entities/products';
+import { CompanyEntity } from '../entities/company';
 
 class ProductsController {
     public async Get(req: Request, res: Response): Promise<void> {
-        const { brand, category, subcategory, color, size, price } = req.query;
+        const { brand, category, subcategory, color, size, min, max, country } = req.query;
         let brandIds: number[] = [];
         let categoryIds: number[] = [];
         let subcategoryIds: number[] = [];
+
 
         if (brand) {
             if (Array.isArray(brand)) {
@@ -18,6 +20,7 @@ class ProductsController {
                 brandIds = [+brand];
             }
         }
+        const sizes = String(size).split(',');
         if (category) {
             if (Array.isArray(category)) {
                 categoryIds = category.map(b => parseInt(b));
@@ -42,7 +45,7 @@ class ProductsController {
             .leftJoinAndSelect('products.brand', 'brand')
             .leftJoinAndSelect('products.parametrs', 'parametrs')
             .leftJoinAndSelect('products.sub_category', 'sub_category')
-            .leftJoinAndSelect('products.prices', 'prices').leftJoinAndSelect('products.company', 'company').leftJoinAndSelect('products.charactics', 'charactics').leftJoinAndSelect('products.cart', 'cart');
+            .leftJoinAndSelect('products.prices', 'prices').leftJoinAndSelect('products.company', 'company').leftJoinAndSelect('products.charactics', 'charactics').leftJoinAndSelect('products.country', 'country');
 
         if (brandIds.length > 0) {
             query = query.andWhere("brand.id IN (:...brandIds)", { brandIds });
@@ -52,9 +55,34 @@ class ProductsController {
         } if (subcategoryIds.length > 0) {
             query = query.andWhere("sub_category.id IN (:...subcategoryIds)", { subcategoryIds });
         }
+        if (country && +country > 0) {
+            query = query.where('country.id = :country_id', { country_id: country });
+        }
+        if (min && max && +min >= 0 && +max > 0) {
+            query = query
+                .innerJoin('products.prices', 'price')
+                .andWhere('price.price >= :min_price', { min_price: +min })
+                .andWhere('price.price <= :max_price', { max_price: +max });
+        }
+        if (size) {
+            query = query.andWhere(':sizes::character varying[] <@ products.size', { sizes })
+        }
 
         const productList = await query.getMany();
-        res.json(productList);
+        if (color) {
+            const filteredProducts = productList.filter(product =>
+                product.parametrs.some(parametr => parametr.color === color)
+            );
+
+            const lastFilter=filteredProducts.map(product => {
+                const matchingParams = product.parametrs.filter(parametr => parametr.color === color);
+                return { ...product, parametrs: matchingParams };
+            });
+    
+            res.json(lastFilter);
+        } else {
+            res.json(productList);
+        }
     }
 
     public async GetId(req: Request, res: Response): Promise<void> {
@@ -68,16 +96,23 @@ class ProductsController {
                 brand: true,
                 parametrs: true,
                 charactics: true,
-                prices: true,
-                cart:true
+                prices: true
             }, where: { id: +id }
         }));
     }
 
     public async Post(req: Request, res: Response) {
-        const { name_uz, name_en, name_ru, name_tr, description_uz, description_en, description_ru, description_tr, delivery_uz, delivery_en, delivery_ru, delivery_tr, size, category, sub_category, company, brand,minimum } = req.body
+        const { name_uz, name_en, name_ru, name_tr, description_uz, description_en, description_ru, description_tr, delivery_uz, delivery_en, delivery_ru, delivery_tr, size, category, sub_category, company, brand, minimum } = req.body
 
-        const products = await AppDataSource.getRepository(ProductsEntity).createQueryBuilder().insert().into(ProductsEntity).values({ name_uz, name_en, name_ru, name_tr, description_uz, description_en, description_ru, description_tr, delivery_uz, delivery_en, delivery_ru, delivery_tr, size, category, sub_category, company, brand,minimum }).returning("*").execute()
+        const foundCompany = await AppDataSource.getRepository(CompanyEntity).findOne({
+            where: { id: +company }, relations: {
+                country: true
+            }
+        })
+
+        const country = foundCompany.country
+
+        const products = await AppDataSource.getRepository(ProductsEntity).createQueryBuilder().insert().into(ProductsEntity).values({ name_uz, name_en, name_ru, name_tr, description_uz, description_en, description_ru, description_tr, delivery_uz, delivery_en, delivery_ru, delivery_tr, size, category, sub_category, company, brand, minimum, country }).returning("*").execute()
 
         res.json({
             status: 201,
@@ -88,8 +123,16 @@ class ProductsController {
 
     public async Put(req: Request, res: Response) {
         try {
-            const { name_uz, name_en, name_ru, name_tr, description_uz, description_en, description_ru, description_tr, delivery_uz, delivery_en, delivery_ru, delivery_tr, size, category, sub_category, company, brand,minimum } = req.body
+            const { name_uz, name_en, name_ru, name_tr, description_uz, description_en, description_ru, description_tr, delivery_uz, delivery_en, delivery_ru, delivery_tr, size, category, sub_category, company, brand, minimum } = req.body
             const { id } = req.params
+
+            const foundCompany = await AppDataSource.getRepository(CompanyEntity).findOne({
+                where: { id: +company }, relations: {
+                    country: true
+                }
+            })
+
+            const country = foundCompany.country
 
             const products = await AppDataSource.getRepository(ProductsEntity).findOneBy({ id: +id })
 
@@ -111,6 +154,7 @@ class ProductsController {
             products.company = company != undefined ? company : products.company
             products.size = size != undefined ? size : products.size
             products.minimum = minimum != undefined ? minimum : products.minimum
+            products.country = country != undefined ? country : products.country
 
             await AppDataSource.manager.save(products)
             res.json({

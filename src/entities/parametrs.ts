@@ -38,6 +38,6 @@ export class ParametrsEntity {
     @UpdateDateColumn({ type: "timestamp" })
     updateAt: Date;
 
-    @ManyToOne(() => ProductsEntity, (products) => products.parametrs)
+    @ManyToOne(() => ProductsEntity, (products) => products.parametrs,{onDelete:"CASCADE",onUpdate:"CASCADE"})
     products: ProductsEntity
 }

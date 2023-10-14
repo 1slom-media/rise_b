@@ -17,10 +17,6 @@ export class CartEntity {
     @IsString()
     price: string
 
-    @Column({ type: "varchar",nullable:true })
-    @IsString()
-    size: string
-
     @Column({ type: "jsonb",nullable:true })
     indeks: object[]
 
@@ -30,9 +26,9 @@ export class CartEntity {
     @UpdateDateColumn({ type: "timestamp" })
     updateAt: Date;
 
-    @ManyToOne(() => ProductsEntity, (products) => products.cart)
+    @ManyToOne(() => ProductsEntity, (products) => products.cart,{onDelete:"CASCADE",onUpdate:"CASCADE"})
     products: ProductsEntity
 
-    @ManyToOne(() => UsersEntity, (users) => users.cart)
+    @ManyToOne(() => UsersEntity, (users) => users.cart,{onDelete:"CASCADE",onUpdate:"CASCADE"})
     user: UsersEntity
 }

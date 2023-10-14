@@ -35,9 +35,9 @@ export class CategoryEntity {
     @UpdateDateColumn({ type: "timestamp" })
     updateAt: Date;
 
-    @OneToMany(() => SubCategoryEntity, (sub_category) => sub_category.category)
+    @OneToMany(() => SubCategoryEntity, (sub_category) => sub_category.category,{onDelete:"CASCADE",onUpdate:"CASCADE"})
     sub_category: SubCategoryEntity[]
 
-    @OneToMany(() => ProductsEntity, (products) => products.category)
+    @OneToMany(() => ProductsEntity, (products) => products.category,{onDelete:"CASCADE",onUpdate:"CASCADE"})
     products: ProductsEntity[]
 }

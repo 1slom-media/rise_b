@@ -41,7 +41,7 @@ export class AdminEntity {
     @UpdateDateColumn({ type: "timestamp" })
     updateAt: Date;
 
-    @ManyToOne(() => CompanyEntity, (company) => company.admin)
+    @ManyToOne(() => CompanyEntity, (company) => company.admin,{onDelete:"CASCADE",onUpdate:"CASCADE"})
     company: CompanyEntity
 
 }

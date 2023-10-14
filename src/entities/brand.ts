@@ -30,6 +30,6 @@ export class BrandEntity {
     @UpdateDateColumn({ type: "timestamp" })
     updateAt: Date;
 
-    @OneToMany(() => ProductsEntity, (products) => products.brand)
+    @OneToMany(() => ProductsEntity, (products) => products.brand,{onDelete:"CASCADE",onUpdate:"CASCADE"})
     products: ProductsEntity[]
 }

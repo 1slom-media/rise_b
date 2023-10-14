@@ -6,18 +6,21 @@ class CartController {
     public async Get(req: Request, res: Response): Promise<void> {
         const { userId } = req.query;
 
-        let query = AppDataSource.getRepository(CartEntity)
-            .createQueryBuilder('cart')
-            .leftJoinAndSelect('cart.products', 'products')
-            .leftJoinAndSelect('cart.user', 'user')
-            .orderBy("cart.id", 'ASC')
+        if (userId && +userId > 0){
+            const carts=await AppDataSource.getRepository(CartEntity).find({
+                order: { id: "ASC" }, relations: [
+                    'products','products.parametrs','products.brand','user'
+                ]
+            });
 
-        if (userId && +userId > 0) {
-            query = query.where('cart.user.id = :user_id', { user_id: userId });
+            res.json(carts.filter(cart=>cart.user.id===+userId));
+        }else{
+            res.json(await AppDataSource.getRepository(CartEntity).find({
+                order: { id: "ASC" }, relations: [
+                    'products','products.parametrs','products.brand'
+                ]
+            }));
         }
-
-        const cart = await query.getMany();
-        res.json(cart);
     }
 
     public async GetId(req: Request, res: Response): Promise<void> {
@@ -32,15 +35,14 @@ class CartController {
     }
 
     public async Post(req: Request, res: Response) {
-        const { quantity, products, indeks, user,price,size } = req.body
+        const { quantity, products, indeks, user, price} = req.body
 
         const cart = new CartEntity()
-        cart.quantity=quantity
-        cart.products=products
-        cart.indeks=indeks
-        cart.price=price
-        cart.user=user
-        cart.size=size
+        cart.quantity = quantity
+        cart.products = products
+        cart.indeks = indeks
+        cart.price = price
+        cart.user = user
 
         await AppDataSource.manager.save(cart)
 
@@ -53,7 +55,7 @@ class CartController {
 
     public async Put(req: Request, res: Response) {
         try {
-            const { quantity, products, indeks, user,price,size } = req.body
+            const { quantity, products, indeks, user, price} = req.body
             const { id } = req.params
 
             const cart = await AppDataSource.getRepository(CartEntity).findOne({
@@ -67,7 +69,6 @@ class CartController {
             cart.products = products != undefined ? products : cart.products.id
             cart.indeks = indeks != undefined ? indeks : cart.indeks
             cart.price = price != undefined ? price : cart.price
-            cart.size = size != undefined ? size : cart.size
             cart.user = user != undefined ? user : cart.user.id
 
             await AppDataSource.manager.save(cart)

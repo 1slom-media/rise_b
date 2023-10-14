@@ -46,6 +46,6 @@ export class CharacticsEntity {
     @UpdateDateColumn({ type: "timestamp" })
     updateAt: Date;
 
-    @ManyToOne(() => ProductsEntity, (products) => products.charactics)
+    @ManyToOne(() => ProductsEntity, (products) => products.charactics,{onDelete:"CASCADE",onUpdate:"CASCADE"})
     products: ProductsEntity
 }
