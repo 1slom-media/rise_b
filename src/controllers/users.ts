@@ -76,6 +76,8 @@ class UsersController {
                 });
             }
 
+        }else{
+            res.send([])
         }
     }
 
@@ -93,6 +95,7 @@ class UsersController {
             }
             // res.redirect('http://localhost:3000');
             res.redirect('https://rise-shopping.uz');
+            return next()
         });
     }
 
