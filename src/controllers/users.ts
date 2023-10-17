@@ -34,102 +34,32 @@ class UsersController {
         }));
     }
 
-    public async Succsess(req: Request, res: Response): Promise<void> {
-        // Assuming your User type is defined like this
-        interface User {
-            email: string;
-            firstName: string;
-            lastName: string;
-            picture: string;
-            accessToken: string;
-        }
+    public async SignGoogle(req: Request, res: Response): Promise<void> {
 
-        if (req.user) {
-            const user = req.user as User
+        const { email, name, surname } = req.body
+        const foundUser = await AppDataSource.getRepository(UsersEntity).findOne({
+            where: { email }
+        })
+        const verify = true
+        if (foundUser == null) {
+            const newUser = await AppDataSource.getRepository(UsersEntity).createQueryBuilder().insert().into(UsersEntity).values({ email, name, surname, verify }).returning("*").execute()
 
-            const { email, firstName, lastName } = user
-
-            const foundUser = await AppDataSource.getRepository(UsersEntity).findOne({
-                where: { email }
-            })
-
-            const name = firstName;
-            const surname = lastName;
-            const verify = true
-
-            if (foundUser == null) {
-                const newUser = await AppDataSource.getRepository(UsersEntity).createQueryBuilder().insert().into(UsersEntity).values({ email, name, surname, verify }).returning("*").execute()
-
-                res.status(200).json({
-                    status: 200,
-                    message: 'User info from Google',
-                    data: newUser.raw[0],
-                    token: sign({ id: newUser.raw[0]?.id }),
-                });
-
-            } else {
-                res.status(200).json({
-                    success: true,
-                    message: 'successful',
-                    data: foundUser,
-                    token: sign({ id: foundUser.id })
-                });
-            }
-
-        }else{
-            res.send([])
-        }
-    }
-
-    public async Failed(req: Request, res: Response): Promise<void> {
-        res.status(401).json({
-            success: false,
-            message: 'failure',
-        });
-    }
-
-    public async LogOut(req: Request, res: Response, next: NextFunction): Promise<void> {
-        req.logout(function (err) {
-            if (err) {
-                return next(err);
-            }
-            // res.redirect('http://localhost:3000');
-            res.redirect('https://rise-shopping.uz');
-            return next()
-        });
-    }
-
-    public async GoogleAuth(req: Request, res: Response): Promise<void> {
-        passport.authenticate('google', { scope: ['email', 'profile'] })(req, res)
-    }
-
-    public async GoogleCallback(req: Request, res: Response): Promise<void> {
-        passport.authenticate('google', (err, user: any, info) => {
-            if (err) {
-                console.error('Error during Google authentication:', err);
-                return res.status(500).json({ success: false, message: 'Internal server error' });
-            }
-
-            if (!user) {
-                console.error('Google authentication failed:', info);
-                return res.status(401).json({ success: false, message: 'Authentication failed' });
-            }
-
-            // If authentication is successful, log in the user or redirect as needed
-            req.logIn(user, (loginErr) => {
-                if (loginErr) {
-                    console.error('Error during user login:', loginErr);
-                    return res.status(500).json({ success: false, message: 'Internal server error' });
-                }
-
-                // Redirect or respond as needed
-                // res.redirect('http://localhost:3000');
-                res.redirect('https://rise-shopping.uz');
+            res.status(200).json({
+                status: 200,
+                message: 'User info from Google',
+                data: newUser.raw[0],
+                token: sign({ id: newUser.raw[0]?.id }),
             });
-        })(req, res);
+
+        } else {
+            res.status(200).json({
+                success: true,
+                message: 'successful',
+                data: foundUser,
+                token: sign({ id: foundUser.id })
+            });
+        }
     }
-
-
 
     // signup phone
     public async SignUpPhone(req: Request, res: Response) {

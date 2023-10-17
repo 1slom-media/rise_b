@@ -36,12 +36,8 @@ router.post("/verify-email", users.VerifyEmail);
 router.post("/verify-phone", users.VerifyPhone);
 router.post("/resend-email", users.ResendCodeEmail);
 router.post("/resend-phone", users.ResendCodePhone);
+router.post("/google", users.SignGoogle);
 router.put("/users/:id", checkToken, users.Put);
-router.get("/auth/google", users.GoogleAuth);
-router.get("/auth/login/success", users.Succsess);
-router.get("/auth/login/failed", users.Failed);
-router.get("/auth/logout", users.LogOut);
-router.get("/auth/google/callback", users.GoogleCallback);
 router.post("/forgot-password",users.ForgotPassword);
 
 // route country
