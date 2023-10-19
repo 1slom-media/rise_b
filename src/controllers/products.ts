@@ -5,7 +5,7 @@ import { CompanyEntity } from '../entities/company';
 
 class ProductsController {
     public async Get(req: Request, res: Response): Promise<void> {
-        const { brand, category, subcategory, color, size, min, max, country } = req.query;
+        const { brand, category, subcategory, color, size, min, max, country, sort, summ } = req.query;
         let brandIds: number[] = [];
         let categoryIds: number[] = [];
         let subcategoryIds: number[] = [];
@@ -67,6 +67,16 @@ class ProductsController {
         if (size) {
             query = query.andWhere(':sizes::character varying[] <@ products.size', { sizes })
         }
+        if (sort && sort == "aksiya" || sort == "ommabop" || sort == "new") {
+            query = query.andWhere('products.status=:status', { status: sort })
+        }
+        if (summ && summ === "max") {
+            query = query.innerJoin('products.prices', 'price').orderBy('CAST(prices.price AS DECIMAL)', 'DESC');
+        }
+        if (summ && summ === "min") {
+            query = query.innerJoin('products.prices', 'price').orderBy('CAST(prices.price AS DECIMAL)', 'ASC');
+        }
+
 
         const productList = await query.getMany();
         if (color) {
@@ -74,11 +84,11 @@ class ProductsController {
                 product.parametrs.some(parametr => parametr.color === color)
             );
 
-            const lastFilter=filteredProducts.map(product => {
+            const lastFilter = filteredProducts.map(product => {
                 const matchingParams = product.parametrs.filter(parametr => parametr.color === color);
                 return { ...product, parametrs: matchingParams };
             });
-    
+
             res.json(lastFilter);
         } else {
             res.json(productList);
@@ -102,7 +112,7 @@ class ProductsController {
     }
 
     public async Post(req: Request, res: Response) {
-        const { name_uz, name_en, name_ru, name_tr, description_uz, description_en, description_ru, description_tr, delivery_uz, delivery_en, delivery_ru, delivery_tr, size, category, sub_category, company, brand, minimum } = req.body
+        const { name_uz, name_en, name_ru, name_tr, description_uz, description_en, description_ru, description_tr, status, delivery_uz, delivery_en, delivery_ru, delivery_tr, size, category, sub_category, company, brand, minimum } = req.body
 
         const foundCompany = await AppDataSource.getRepository(CompanyEntity).findOne({
             where: { id: +company }, relations: {
@@ -112,7 +122,7 @@ class ProductsController {
 
         const country = foundCompany.country
 
-        const products = await AppDataSource.getRepository(ProductsEntity).createQueryBuilder().insert().into(ProductsEntity).values({ name_uz, name_en, name_ru, name_tr, description_uz, description_en, description_ru, description_tr, delivery_uz, delivery_en, delivery_ru, delivery_tr, size, category, sub_category, company, brand, minimum, country }).returning("*").execute()
+        const products = await AppDataSource.getRepository(ProductsEntity).createQueryBuilder().insert().into(ProductsEntity).values({ name_uz, name_en, name_ru, name_tr, description_uz, description_en, description_ru, description_tr, status, delivery_uz, delivery_en, delivery_ru, delivery_tr, size, category, sub_category, company, brand, minimum, country }).returning("*").execute()
 
         res.json({
             status: 201,
@@ -123,12 +133,12 @@ class ProductsController {
 
     public async Put(req: Request, res: Response) {
         try {
-            const { name_uz, name_en, name_ru, name_tr, description_uz, description_en, description_ru, description_tr, delivery_uz, delivery_en, delivery_ru, delivery_tr, size, category, sub_category, company, brand, minimum } = req.body
+            const { name_uz, name_en, name_ru, name_tr, description_uz, description_en, description_ru, description_tr, status, delivery_uz, delivery_en, delivery_ru, delivery_tr, size, category, sub_category, company, brand, minimum } = req.body
             const { id } = req.params
 
             let country;
 
-            if(company){
+            if (company) {
                 const foundCompany = await AppDataSource.getRepository(CompanyEntity).findOne({
                     where: { id: +company }, relations: {
                         country: true
@@ -138,12 +148,14 @@ class ProductsController {
                 country = foundCompany.country
             }
 
-            const products = await AppDataSource.getRepository(ProductsEntity).findOne({ where:{id:+id},relations:{
-                brand:true,
-                company:true,
-                sub_category:true,
-                category:true
-            } })
+            const products = await AppDataSource.getRepository(ProductsEntity).findOne({
+                where: { id: +id }, relations: {
+                    brand: true,
+                    company: true,
+                    sub_category: true,
+                    category: true
+                }
+            })
 
             products.name_uz = name_uz != undefined ? name_uz : products.name_uz
             products.name_en = name_en != undefined ? name_en : products.name_en
@@ -164,6 +176,7 @@ class ProductsController {
             products.size = size != undefined ? size : products.size
             products.minimum = minimum != undefined ? minimum : products.minimum
             products.country = country != undefined ? country : products.country
+            products.status = status != undefined ? status : products.status
 
             await AppDataSource.manager.save(products)
             res.json({

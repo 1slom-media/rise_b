@@ -63,6 +63,9 @@ export class ProductsEntity {
     @Column({ type: "varchar" })
     delivery_tr: string
 
+    @Column({ type: "varchar",nullable:true,default:"new"})
+    status: string
+
     @CreateDateColumn({ type: "timestamp" })
     createdAt: Date;
 

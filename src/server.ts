@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 5000
 app.use(express.json());
 app.use(
     cors({
-        origin: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002', 'http://localhost:3003', 'http://localhost:3004', 'http://localhost:3005', 'https://rise-shopping.uz', 'https://admin.rise-shopping.uz'], // Allow requests only from this origin
+        origin: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002', 'http://localhost:3003', 'http://localhost:3004', 'http://localhost:3005', 'https://rise-shopping.uz', 'https://admin.rise-shopping.uz','https://admin.rise-shopping.com'], // Allow requests only from this origin
         credentials: true, // Allow credentials (cookies, headers, etc.)
     })
 );
