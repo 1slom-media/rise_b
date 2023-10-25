@@ -24,6 +24,7 @@ router.get("/admin/:id", admin.GetId);
 router.post("/admin", upload.single('image'), checkToken, admin.Post);
 router.post("/admin-login", admin.SignIn);
 router.put("/admin/:id", upload.single('image'), checkToken, admin.Put);
+router.delete("/admin/:id", checkToken, admin.Delete);
 
 // route users
 router.get("/users", users.Get);

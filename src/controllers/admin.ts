@@ -48,7 +48,7 @@ class StaffController {
                 message: "admin created",
                 data: admin.raw[0]
             })
-        }else {
+        } else {
             return res.json({ status: 400, message: 'Email is unique!? This email has already been registered' })
         }
     }
@@ -93,11 +93,13 @@ class StaffController {
     public async Put(req: Request, res: Response) {
         try {
             let { name, surname, phone, email, password, role, company } = req.body
+            console.log(req.body);
+
             const { id } = req.params
             let image;
-            if(req.file){
+            if (req.file) {
                 const { filename } = req.file;
-                image=filename
+                image = filename
             }
             password = await hashed(password);
 
@@ -126,6 +128,26 @@ class StaffController {
                 status: 200,
                 message: "admin updated",
                 data: oldData
+            })
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    public async Delete(req: Request, res: Response) {
+        try {
+            const { id } = req.params
+
+            const admin = await AppDataSource.getRepository(AdminEntity).createQueryBuilder().update(AdminEntity)
+                .set({ status: "not_active" })
+                .where({ id })
+                .returning("*")
+                .execute()
+
+            res.json({
+                status: 200,
+                message: "admin refusal",
+                data: admin.raw[0]
             })
         } catch (error) {
             console.log(error);

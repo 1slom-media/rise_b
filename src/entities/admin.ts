@@ -35,6 +35,9 @@ export class AdminEntity {
     @Column({ type: "varchar",default:"admin" })
     role: string; 
 
+    @Column({ type: "varchar",default:"active" })
+    status: string; 
+
     @CreateDateColumn({ type: "timestamp" })
     createdAt: Date;
 
