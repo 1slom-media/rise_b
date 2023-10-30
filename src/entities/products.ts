@@ -66,6 +66,9 @@ export class ProductsEntity {
     @Column({ type: "varchar",nullable:true,default:"new"})
     status: string
 
+    @Column({ type: "varchar",default:"sale"})
+    onsale: string
+
     @CreateDateColumn({ type: "timestamp" })
     createdAt: Date;
 

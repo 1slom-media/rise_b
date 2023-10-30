@@ -112,7 +112,7 @@ class ProductsController {
     }
 
     public async Post(req: Request, res: Response) {
-        const { name_uz, name_en, name_ru, name_tr, description_uz, description_en, description_ru, description_tr, status, delivery_uz, delivery_en, delivery_ru, delivery_tr, size, category, sub_category, company, brand, minimum } = req.body
+        const { name_uz, name_en, name_ru, name_tr, description_uz, description_en, description_ru, description_tr, status, delivery_uz, delivery_en, delivery_ru, delivery_tr, size, category, sub_category, company, brand, minimum,onsale } = req.body
 
         const foundCompany = await AppDataSource.getRepository(CompanyEntity).findOne({
             where: { id: +company }, relations: {
@@ -122,7 +122,7 @@ class ProductsController {
 
         const country = foundCompany.country
 
-        const products = await AppDataSource.getRepository(ProductsEntity).createQueryBuilder().insert().into(ProductsEntity).values({ name_uz, name_en, name_ru, name_tr, description_uz, description_en, description_ru, description_tr, status, delivery_uz, delivery_en, delivery_ru, delivery_tr, size, category, sub_category, company, brand, minimum, country }).returning("*").execute()
+        const products = await AppDataSource.getRepository(ProductsEntity).createQueryBuilder().insert().into(ProductsEntity).values({ name_uz, name_en, name_ru, name_tr, description_uz, description_en, description_ru, description_tr, status, delivery_uz, delivery_en, delivery_ru, delivery_tr, size, category, sub_category, company, brand, minimum, country,onsale }).returning("*").execute()
 
         res.json({
             status: 201,
@@ -133,7 +133,7 @@ class ProductsController {
 
     public async Put(req: Request, res: Response) {
         try {
-            const { name_uz, name_en, name_ru, name_tr, description_uz, description_en, description_ru, description_tr, status, delivery_uz, delivery_en, delivery_ru, delivery_tr, size, category, sub_category, company, brand, minimum } = req.body
+            const { name_uz, name_en, name_ru, name_tr, description_uz, description_en, description_ru, description_tr, status, delivery_uz, delivery_en, delivery_ru, delivery_tr, size, category, sub_category, company, brand, minimum,onsale } = req.body
             const { id } = req.params
 
             let country;
@@ -177,6 +177,7 @@ class ProductsController {
             products.minimum = minimum != undefined ? minimum : products.minimum
             products.country = country != undefined ? country : products.country
             products.status = status != undefined ? status : products.status
+            products.onsale = onsale != undefined ? onsale : products.onsale
 
             await AppDataSource.manager.save(products)
             res.json({

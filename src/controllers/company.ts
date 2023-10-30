@@ -10,7 +10,8 @@ class CompanyController {
             relations: {
                 country:true,
                 admin:true,
-                products:true
+                products:true,
+                brand:true
             }
         }));
     }
@@ -23,7 +24,8 @@ class CompanyController {
             relations: {
                 country:true,
                 admin:true,
-                products:true
+                products:true,
+                brand:true
             }
         }));
     }

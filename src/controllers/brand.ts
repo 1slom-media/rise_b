@@ -6,7 +6,8 @@ class BrandController {
     public async Get(req: Request, res: Response): Promise<void> {
         res.json(await AppDataSource.getRepository(BrandEntity).find({
             order: { id: "ASC" }, relations: {
-                products: true
+                products: true,
+                company: true
             }
         }));
     }
@@ -16,15 +17,16 @@ class BrandController {
 
         res.json(await AppDataSource.getRepository(BrandEntity).find({
             where: { id: +id }, relations: {
-                products: true
+                products: true,
+                company: true
             }
         }));
     }
 
     public async Post(req: Request, res: Response) {
-        const { brand_uz, brand_en, brand_ru, brand_tr } = req.body
+        const { brand_uz, brand_en, brand_ru, brand_tr, company } = req.body
 
-        const brand = await AppDataSource.getRepository(BrandEntity).createQueryBuilder().insert().into(BrandEntity).values({ brand_uz, brand_en, brand_ru, brand_tr }).returning("*").execute()
+        const brand = await AppDataSource.getRepository(BrandEntity).createQueryBuilder().insert().into(BrandEntity).values({ brand_uz, brand_en, brand_ru, brand_tr, company }).returning("*").execute()
 
         res.json({
             status: 201,
@@ -35,15 +37,16 @@ class BrandController {
 
     public async Put(req: Request, res: Response) {
         try {
-            const { brand_uz, brand_en, brand_ru, brand_tr } = req.body
+            const { brand_uz, brand_en, brand_ru, brand_tr, company } = req.body
             const { id } = req.params
 
-            const brand = await AppDataSource.getRepository(BrandEntity).findOneBy({ id: +id })
+            const brand = await AppDataSource.getRepository(BrandEntity).findOne({ where: { id: +id }, relations: { company: true } })
 
             brand.brand_uz = brand_uz != undefined ? brand_uz : brand.brand_uz
             brand.brand_en = brand_en != undefined ? brand_en : brand.brand_en
             brand.brand_ru = brand_ru != undefined ? brand_ru : brand.brand_ru
             brand.brand_tr = brand_tr != undefined ? brand_tr : brand.brand_tr
+            brand.company = company != undefined ? company : brand.company.id
 
             await AppDataSource.manager.save(brand)
             res.json({
