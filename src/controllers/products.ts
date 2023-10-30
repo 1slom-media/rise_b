@@ -56,7 +56,7 @@ class ProductsController {
             query = query.andWhere("sub_category.id IN (:...subcategoryIds)", { subcategoryIds });
         }
         if (country && +country > 0) {
-            query = query.where('country.id = :country_id', { country_id: country });
+            query = query.andWhere('country.id = :country_id', { country_id: country });
         }
         if (min && max && +min >= 0 && +max > 0) {
             query = query
@@ -112,7 +112,7 @@ class ProductsController {
     }
 
     public async Post(req: Request, res: Response) {
-        const { name_uz, name_en, name_ru, name_tr, description_uz, description_en, description_ru, description_tr, status, delivery_uz, delivery_en, delivery_ru, delivery_tr, size, category, sub_category, company, brand, minimum,onsale } = req.body
+        const { name_uz, name_en, name_ru, name_tr, description_uz, description_en, description_ru, description_tr, status, delivery_uz, delivery_en, delivery_ru, delivery_tr, size, category, sub_category, company, brand, minimum, onsale } = req.body
 
         const foundCompany = await AppDataSource.getRepository(CompanyEntity).findOne({
             where: { id: +company }, relations: {
@@ -122,7 +122,7 @@ class ProductsController {
 
         const country = foundCompany.country
 
-        const products = await AppDataSource.getRepository(ProductsEntity).createQueryBuilder().insert().into(ProductsEntity).values({ name_uz, name_en, name_ru, name_tr, description_uz, description_en, description_ru, description_tr, status, delivery_uz, delivery_en, delivery_ru, delivery_tr, size, category, sub_category, company, brand, minimum, country,onsale }).returning("*").execute()
+        const products = await AppDataSource.getRepository(ProductsEntity).createQueryBuilder().insert().into(ProductsEntity).values({ name_uz, name_en, name_ru, name_tr, description_uz, description_en, description_ru, description_tr, status, delivery_uz, delivery_en, delivery_ru, delivery_tr, size, category, sub_category, company, brand, minimum, country, onsale }).returning("*").execute()
 
         res.json({
             status: 201,
@@ -133,7 +133,7 @@ class ProductsController {
 
     public async Put(req: Request, res: Response) {
         try {
-            const { name_uz, name_en, name_ru, name_tr, description_uz, description_en, description_ru, description_tr, status, delivery_uz, delivery_en, delivery_ru, delivery_tr, size, category, sub_category, company, brand, minimum,onsale } = req.body
+            const { name_uz, name_en, name_ru, name_tr, description_uz, description_en, description_ru, description_tr, status, delivery_uz, delivery_en, delivery_ru, delivery_tr, size, category, sub_category, company, brand, minimum, onsale } = req.body
             const { id } = req.params
 
             let country;
