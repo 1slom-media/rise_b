@@ -25,6 +25,10 @@ export class SubCategoryEntity {
     @IsString()
     sub_category_tr: string
 
+    @Column({ type: "text",nullable:true})
+    @IsString()
+    image: string
+
     @CreateDateColumn({ type: "timestamp" })
     createdAt: Date;
 

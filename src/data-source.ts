@@ -15,6 +15,7 @@ import { PricesEntity } from "./entities/prices"
 import { CharacticsEntity } from "./entities/charactics"
 import dotenv from 'dotenv'
 import { CartEntity } from "./entities/cart"
+import { BannerEntity } from "./entities/banner"
 dotenv.config()
 
 export const AppDataSource = new DataSource({
@@ -26,7 +27,7 @@ export const AppDataSource = new DataSource({
     database: process.env.PG_DATABASE,
     synchronize: true,
     logging: false,
-    entities: [UsersEntity,CountryEntity,AdminEntity,CategoryEntity,CompanyEntity,SubCategoryEntity,BrandEntity,CardsEntity,SizeEntity,ProductsEntity,ParametrsEntity,PricesEntity,CharacticsEntity,CartEntity],
+    entities: [UsersEntity, CountryEntity, AdminEntity, CategoryEntity, CompanyEntity, SubCategoryEntity, BrandEntity, CardsEntity, SizeEntity, ProductsEntity, ParametrsEntity, PricesEntity, CharacticsEntity, CartEntity,BannerEntity],
     migrations: [],
     subscribers: [],
 })

@@ -15,6 +15,7 @@ import parametrs from "../controllers/parametrs";
 import prices from "../controllers/prices";
 import charactics from "../controllers/charactics";
 import cart from "../controllers/cart";
+import banner from "../controllers/banner";
 
 const router = Router()
 
@@ -65,9 +66,16 @@ router.delete("/category/:id", checkToken, category.Delete);
 // route sub_category
 router.get("/sub_category", sub_category.Get);
 router.get("/sub_category/:id", sub_category.GetId);
-router.post("/sub_category", checkToken, sub_category.Post);
-router.put("/sub_category/:id", checkToken, sub_category.Put);
+router.post("/sub_category",upload.single('image'), checkToken, sub_category.Post);
+router.put("/sub_category/:id",upload.single('image'), checkToken, sub_category.Put);
 router.delete("/sub_category/:id", checkToken, sub_category.Delete);
+
+// route banner
+router.get("/banner", banner.Get);
+router.get("/banner/:id", banner.GetId);
+router.post("/banner",upload.single('image'), checkToken, banner.Post);
+router.put("/banner/:id",upload.single('image'), checkToken, banner.Put);
+router.delete("/banner/:id", checkToken, banner.Delete);
 
 // route brand
 router.get("/brand", brand.Get);

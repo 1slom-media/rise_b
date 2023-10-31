@@ -18,11 +18,7 @@ app.use(
         credentials: true, // Allow credentials (cookies, headers, etc.)
     })
 );
-// app.use(
-//     cors({ // Allow requests only from this origin
-//         credentials: true, // Allow credentials (cookies, headers, etc.)
-//     })
-// );
+
 
 app.use(session({ secret: 'cats', resave: false, saveUninitialized: true }));
 app.use(passport.initialize());
