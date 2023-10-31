@@ -32,7 +32,7 @@ class SubCategoryController {
         const { filename } = req.file;
         const image = filename
 
-        const sub_category = await AppDataSource.getRepository(SubCategoryEntity).createQueryBuilder().insert().into(SubCategoryEntity).values({ sub_category_uz, sub_category_en, sub_category_ru, sub_category_tr, category,image }).returning("*").execute()
+        const sub_category = await AppDataSource.getRepository(SubCategoryEntity).createQueryBuilder().insert().into(SubCategoryEntity).values({ sub_category_uz, sub_category_en, sub_category_ru, sub_category_tr, category, image }).returning("*").execute()
 
         res.json({
             status: 201,
@@ -46,13 +46,15 @@ class SubCategoryController {
             const { sub_category_uz, sub_category_en, sub_category_ru, sub_category_tr, category } = req.body
             const { id } = req.params
             let image;
-            if(req.file){
+            if (req.file) {
                 const { filename } = req.file;
-                image=filename
+                image = filename
             }
 
             // old image delete
-            const oldData = await AppDataSource.getRepository(SubCategoryEntity).findOne({ where: { id: +id } })
+            const oldData = await AppDataSource.getRepository(SubCategoryEntity).findOne({ where: { id: +id },relations:{
+                category:true
+            } })
             if (oldData && image) {
                 const imageToDelete = oldData?.image;
                 const imagePath = path.join(process.cwd(), 'uploads', imageToDelete);
@@ -65,8 +67,8 @@ class SubCategoryController {
             oldData.sub_category_en = sub_category_en != "" ? sub_category_en : oldData.sub_category_en
             oldData.sub_category_ru = sub_category_ru != "" ? sub_category_ru : oldData.sub_category_ru
             oldData.sub_category_tr = sub_category_tr != "" ? sub_category_tr : oldData.sub_category_tr
-            oldData.category = category != "" ? category : oldData.category
-            oldData.image=image
+            oldData.category = category != "" ? category : oldData.category.id
+            oldData.image = image != undefined ? image : oldData.image
 
             await AppDataSource.manager.save(oldData)
             res.json({
