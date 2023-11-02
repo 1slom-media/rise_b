@@ -55,7 +55,7 @@ class SubCategoryController {
             const oldData = await AppDataSource.getRepository(SubCategoryEntity).findOne({ where: { id: +id },relations:{
                 category:true
             } })
-            if (oldData && image) {
+            if (oldData && image && oldData.image!=null) {
                 const imageToDelete = oldData?.image;
                 const imagePath = path.join(process.cwd(), 'uploads', imageToDelete);
                 fs.unlinkSync(imagePath);
