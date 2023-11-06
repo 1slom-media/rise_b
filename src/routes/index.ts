@@ -107,6 +107,7 @@ router.delete("/size/:id", checkToken, size.Delete);
 
 // route products
 router.get("/products", products.Get);
+router.get("/search", products.GetSearch);
 router.get("/products/:id", products.GetId);
 router.post("/products", checkToken, products.Post);
 router.put("/products/:id", checkToken, products.Put);

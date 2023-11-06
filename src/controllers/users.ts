@@ -139,7 +139,7 @@ class UsersController {
         if (foundUser && foundUser.verify === false) {
             const code = randomNum();
             redis.set(phone, code, 'EX', 120);
-            sms.send(phone, `Welcome ! We appreciate your interest in our service. Your Rise verification code ✔:${code}`)
+            sms.send(phone, `Для завершения процедуры регистрации на https://rise-shopping.uz пожалуйста, введите код: ${code}`)
             res.json({
                 status: 201,
                 message: "Your code sent",
@@ -203,7 +203,7 @@ class UsersController {
                 }, // sender address
                 to: email, // list of receivers
                 subject: `Rise verification code ✔`, // Subject line
-                html: `Welcome ! We appreciate your interest in our service. Your verification code: <br/> <br/> <b>${code}</b>`, // html body
+                html: `Для завершения процедуры регистрации на https://rise-shopping.uz пожалуйста, введите код: <b>${code}</b>`, // html body
             });
             return res.json({
                 status: 201,
@@ -220,7 +220,7 @@ class UsersController {
                 }, // sender address
                 to: email, // list of receivers
                 subject: `Rise verification code ✔`, // Subject line
-                html: `Welcome ! We appreciate your interest in our service. Your verification code: <br/> <br/> <b>${code}</b>`, // html body
+                html: `Для завершения процедуры регистрации на https://rise-shopping.uz пожалуйста, введите код: <b>${code}</b>`, // html body
             });
             return res.json({
                 status: 201,
@@ -311,7 +311,7 @@ class UsersController {
                 }, // sender address
                 to: email, // list of receivers
                 subject: `Rise verification code ✔`, // Subject line
-                html: `Welcome ! We appreciate your interest in our service. Your verification code: <br/> <br/> <b>${code}</b>`, // html body
+                html: `Для завершения процедуры регистрации на https://rise-shopping.uz пожалуйста, введите код: <b>${code}</b>`, // html body
             });
             res.json({
                 status: 201,
@@ -393,7 +393,7 @@ class UsersController {
                         }, // sender address
                         to: email, // list of receivers
                         subject: `Rise verification code ✔`, // Subject line
-                        html: `Welcome ! We appreciate your interest in our service. Your verification code: <br/> <br/> <b>${code}</b>`, // html body
+                        html: `Для завершения процедуры регистрации на https://rise-shopping.uz пожалуйста, введите код:  <b>${code}</b>`, // html body
                     });
                     return res.json({
                         status: 201,

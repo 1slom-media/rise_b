@@ -2,10 +2,11 @@ import { Request, Response } from 'express';
 import { AppDataSource } from '../data-source';
 import { ProductsEntity } from '../entities/products';
 import { CompanyEntity } from '../entities/company';
+import { Like } from 'typeorm';
 
 class ProductsController {
     public async Get(req: Request, res: Response): Promise<void> {
-        const { brand, category, subcategory, color, size, min, max, country, sort, summ } = req.query;
+        const { brand, category, subcategory, color, size, min, max, country, sort, summ, search } = req.query;
         let brandIds: number[] = [];
         let categoryIds: number[] = [];
         let subcategoryIds: number[] = [];
@@ -77,7 +78,6 @@ class ProductsController {
             query = query.innerJoin('products.prices', 'price').orderBy('CAST(prices.price AS DECIMAL)', 'ASC');
         }
 
-
         const productList = await query.getMany();
         if (color) {
             const filteredProducts = productList.filter(product =>
@@ -93,6 +93,26 @@ class ProductsController {
         } else {
             res.json(productList);
         }
+    }
+
+    public async GetSearch(req: Request, res: Response): Promise<void> {
+        let { s } = req.query
+
+        res.json(await AppDataSource.getRepository(ProductsEntity).find({
+            relations: {
+                category: true,
+                sub_category: true,
+                company: true,
+                brand: true,
+                parametrs: true,
+                charactics: true,
+                prices: true
+            }, where: [{ name_uz: Like(`${s}%`) },
+            { name_en: Like(`${s}%`) },
+            { name_ru: Like(`${s}%`) },
+            { name_tr: Like(`${s}%`) }
+            ]
+        }));
     }
 
     public async GetId(req: Request, res: Response): Promise<void> {
