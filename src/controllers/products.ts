@@ -98,6 +98,8 @@ class ProductsController {
     public async GetSearch(req: Request, res: Response): Promise<void> {
         let { s } = req.query
 
+        s = s.toString().trim().toLowerCase()
+
         res.json(await AppDataSource.getRepository(ProductsEntity).find({
             relations: {
                 category: true,
@@ -110,7 +112,11 @@ class ProductsController {
             }, where: [{ name_uz: Like(`${s}%`) },
             { name_en: Like(`${s}%`) },
             { name_ru: Like(`${s}%`) },
-            { name_tr: Like(`${s}%`) }
+            { name_tr: Like(`${s}%`) },
+            { name_uz: Like(`%${s}%`) },
+            { name_en: Like(`%${s}%`) },
+            { name_ru: Like(`%${s}%`) },
+            { name_tr: Like(`%${s}%`) },
             ]
         }));
     }
@@ -132,7 +138,12 @@ class ProductsController {
     }
 
     public async Post(req: Request, res: Response) {
-        const { name_uz, name_en, name_ru, name_tr, description_uz, description_en, description_ru, description_tr, status, delivery_uz, delivery_en, delivery_ru, delivery_tr, size, category, sub_category, company, brand, minimum, onsale } = req.body
+        let { name_uz, name_en, name_ru, name_tr, description_uz, description_en, description_ru, description_tr, status, delivery_uz, delivery_en, delivery_ru, delivery_tr, size, category, sub_category, company, brand, minimum, onsale } = req.body
+
+        name_uz = name_uz.toLowerCase()
+        name_en = name_en.toLowerCase()
+        name_ru = name_ru.toLowerCase()
+        name_tr = name_tr.toLowerCase()
 
         const foundCompany = await AppDataSource.getRepository(CompanyEntity).findOne({
             where: { id: +company }, relations: {
