@@ -17,7 +17,7 @@ class CartController {
         }else{
             res.json(await AppDataSource.getRepository(CartEntity).find({
                 order: { id: "ASC" }, relations: [
-                    'products','products.parametrs','products.brand'
+                    'products','products.parametrs','products.brand','user'
                 ]
             }));
         }
