@@ -83,7 +83,7 @@ class UsersController {
                 message: "your code sent",
                 data: user.raw[0]
             })
-        } if (foundUser.length && User?.verify === false) {
+        } if (foundUser.length) {
             const code = randomNum();
             redis.set(phone, code, 'EX', 120);
             sms.send(phone, `Для завершения процедуры регистрации на https://rise-shopping.uz пожалуйста, введите код: ${code}`)
@@ -210,7 +210,7 @@ class UsersController {
                 message: "your code sent",
                 data: user.raw[0]
             })
-        } if (foundUser.length && User?.verify === false) {
+        } if (foundUser.length) {
             const code = randomNum();
             redis.set(email, code, 'EX', 120);
             Mail({
