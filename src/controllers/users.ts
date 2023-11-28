@@ -81,7 +81,8 @@ class UsersController {
             return res.json({
                 status: 201,
                 message: "your code sent",
-                data: user.raw[0]
+                data: user.raw[0],
+                code:code
             })
         } if (foundUser.length) {
             const code = randomNum();
@@ -89,7 +90,8 @@ class UsersController {
             sms.send(phone, `Для завершения процедуры регистрации на https://rise-shopping.uz пожалуйста, введите код: ${code}`)
             return res.json({
                 status: 201,
-                message: "your code sent"
+                message: "your code sent",
+                code:code
             })
         } else {
             return res.json({ status: 400, message: 'Phone is unique!? This phone has already been registered' })
@@ -208,7 +210,8 @@ class UsersController {
             return res.json({
                 status: 201,
                 message: "your code sent",
-                data: user.raw[0]
+                data: user.raw[0],
+                code:code
             })
         } if (foundUser.length) {
             const code = randomNum();
@@ -224,7 +227,8 @@ class UsersController {
             });
             return res.json({
                 status: 201,
-                message: "your code sent"
+                message: "your code sent",
+                code:code
             })
         } else {
             return res.json({ status: 400, message: 'Email is unique!? This email has already been registered' })
