@@ -6,7 +6,7 @@ import { Like } from 'typeorm';
 
 class ProductsController {
     public async Get(req: Request, res: Response): Promise<void> {
-        const { brand, category, subcategory, color, size, min, max, country, sort, summ, search } = req.query;
+        const { brand, category, subcategory, color, size, min, max, country, sort, summ, skip,take } = req.query;
         let brandIds: number[] = [];
         let categoryIds: number[] = [];
         let subcategoryIds: number[] = [];
@@ -51,6 +51,9 @@ class ProductsController {
         if (brandIds.length > 0) {
             query = query.andWhere("brand.id IN (:...brandIds)", { brandIds });
         }
+        if(skip && take){
+            query=query.skip(+take*(+skip-1)).take(+take)
+        }
         if (categoryIds.length > 0) {
             query = query.andWhere("category.id IN (:...categoryIds)", { categoryIds });
         } if (subcategoryIds.length > 0) {
@@ -78,7 +81,7 @@ class ProductsController {
             query = query.innerJoin('products.prices', 'price').orderBy('CAST(prices.price AS DECIMAL)', 'ASC');
         }
 
-        const productList = await query.getMany();
+        const productList = await query.orderBy('products.id','DESC').getMany();
         if (color) {
             const filteredProducts = productList.filter(product =>
                 product.parametrs.some(parametr => parametr.color === color)
