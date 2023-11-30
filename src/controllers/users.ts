@@ -82,22 +82,24 @@ class UsersController {
                 status: 201,
                 message: "your code sent",
                 data: user.raw[0],
-                code:code
+                code: code
             })
-        } if (foundUser.length) {
+        } if (foundUser.length && User?.verify === false) {
             const code = randomNum();
             redis.set(phone, code, 'EX', 120);
             sms.send(phone, `Для завершения процедуры регистрации на https://rise-shopping.uz пожалуйста, введите код: ${code}`)
             return res.json({
                 status: 201,
                 message: "your code sent",
-                code:code
+                code: code
             })
         } else {
             return res.json({ status: 400, message: 'Phone is unique!? This phone has already been registered' })
         }
 
     }
+
+
 
     // verify phone
     public async VerifyPhone(req: Request, res: Response) {
@@ -211,9 +213,9 @@ class UsersController {
                 status: 201,
                 message: "your code sent",
                 data: user.raw[0],
-                code:code
+                code: code
             })
-        } if (foundUser.length) {
+        } if (foundUser.length && User?.verify === false) {
             const code = randomNum();
             redis.set(email, code, 'EX', 120);
             Mail({
@@ -228,7 +230,7 @@ class UsersController {
             return res.json({
                 status: 201,
                 message: "your code sent",
-                code:code
+                code: code
             })
         } else {
             return res.json({ status: 400, message: 'Email is unique!? This email has already been registered' })
@@ -422,6 +424,40 @@ class UsersController {
                         message: "your code sent"
                     })
                 }
+            }
+        } catch (error) {
+            res.json({
+                status: 400,
+                message: error.message,
+            })
+        }
+    }
+
+    // forgot password
+    public async LogOut(req: Request, res: Response) {
+        try {
+            const { id } = req.params
+
+            const User = await AppDataSource.getRepository(UsersEntity).findOne({
+                where: { id: +id }
+            })
+
+            if (User) {
+                const user = await AppDataSource.getRepository(UsersEntity).createQueryBuilder().update(UsersEntity)
+                    .set({ verify: false })
+                    .where({ id })
+                    .returning("*")
+                    .execute()
+
+                    res.json({
+                        status: 200,
+                        message: "User verifay false",
+                    })
+            }else{
+                res.json({
+                    status: 404,
+                    message: "User not found",
+                }) 
             }
         } catch (error) {
             res.json({
