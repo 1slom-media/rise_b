@@ -63,7 +63,7 @@ export class ProductsEntity {
     @Column({ type: "varchar" })
     delivery_tr: string
 
-    @Column({ type: "varchar",nullable:true,default:"new"})
+    @Column({ type: "varchar",nullable:true})
     status: string
 
     @Column({ type: "varchar",default:"sale"})
