@@ -131,8 +131,8 @@ router.delete("/parametrs/:id", checkToken, parametrs.Delete);
 
 router.get("/orders", order.Get);
 router.get("/orders/:id", order.GetId);
-router.post("/orders",checkToken, order.Post);
-// router.put("/orders/:id", upload.fields([{ name: 'image1' }, { name: 'image2' }, { name: 'image3' }, { name: 'image4' }]), checkToken, order.Put);
+// router.post("/orders",checkToken, order.Post);
+router.delete("/orders/:id",checkToken, order.Refund);
 // router.delete("/orders/:id", checkToken, order.Delete);
 
 // stripe

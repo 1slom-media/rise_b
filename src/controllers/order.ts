@@ -35,36 +35,41 @@ class OrdersController {
         }));
     }
 
-    public async Post(req: Request, res: Response) {
-        const { user,punkt,phone} = req.body
+    // public async Post(req: Request, res: Response) {
+    //     const { user, punkt, phone } = req.body
 
-        const carts = await AppDataSource.getRepository(CartEntity).find({
-            relations:[
-                'products', 'products.parametrs', 'products.brand', 'user'
-            ]
-        })
+    //     const carts = await AppDataSource.getRepository(CartEntity).find({
+    //         relations: [
+    //             'products', 'products.parametrs', 'products.brand', 'user'
+    //         ]
+    //     })
 
-        const cartFilter = carts.filter(cart => cart.user.id === +user);
+    //     const cartFilter = carts.filter(cart => cart.user.id === +user);
 
-        for (const cart of cartFilter) {
-            const order = new OrdersEntity()
-            order.quantity=cart.quantity
-            order.price=cart.price
-            order.products=cart.products
-            order.punkt=punkt
-            order.phone=phone
-            order.user=cart.user
-            order.indeks=cart.indeks
-            order.company=cart.company
-            await AppDataSource.manager.save(order)
-        }
+    //     for (const cart of cartFilter) {
+    //         const rise_price = +cart.price - +cart.product_price
+    //         const order = new OrdersEntity()
+    //         order.quantity = cart.quantity
+    //         order.total_price = cart.price
+    //         order.product_price = cart.product_price
+    //         order.rise_price = String(rise_price)
+    //         order.products = cart.products
+    //         order.punkt = punkt
+    //         order.phone = phone
+    //         order.user = user
+    //         order.indeks = cart.indeks
+    //         order.company = cart.company
+    //         await AppDataSource.manager.save(order)
+    //     }
+
+    //     await AppDataSource.getRepository(CartEntity).remove(cartFilter);
 
 
-        res.json({
-            status: 201,
-            message: "order created"
-        })
-    }
+    //     res.json({
+    //         status: 201,
+    //         message: "order created"
+    //     })
+    // }
 
     // public async Put(req: Request, res: Response) {
     //     try {
@@ -111,6 +116,26 @@ class OrdersController {
     //         console.log(error);
     //     }
     // }
+
+    public async Refund(req: Request, res: Response) {
+        try {
+            const { id } = req.params
+
+            const order = await AppDataSource.getRepository(OrdersEntity).createQueryBuilder().update(OrdersEntity)
+                .set({ status: "refund" })
+                .where({ id })
+                .returning("*")
+                .execute()
+
+            res.json({
+                status: 200,
+                message: "order refusal",
+                data: order.raw[0]
+            })
+        } catch (error) {
+            console.log(error);
+        }
+    }
 }
 
 export default new OrdersController();

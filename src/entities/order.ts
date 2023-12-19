@@ -16,7 +16,15 @@ export class OrdersEntity {
 
     @Column({ type: "varchar"})
     @IsString()
-    price: string
+    total_price: string
+
+    @Column({ type: "varchar"})
+    @IsString()
+    product_price: string
+
+    @Column({ type: "varchar"})
+    @IsString()
+    rise_price: string
 
     @Column({ type: "varchar"})
     @IsString()

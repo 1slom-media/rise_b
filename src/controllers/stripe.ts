@@ -42,6 +42,7 @@ class StripeController {
                 payment_method_types: ["card"],
                 mode: "payment",
                 line_items: cartFilter.map((cart: any) => {
+                    const price=+cart.price / + cart.quantity
                     return {
                         price_data: {
                             currency: "usd",
@@ -52,14 +53,14 @@ class StripeController {
                                     id: cart.id,
                                 },
                             },
-                            unit_amount: +cart.price * 100,
+                            unit_amount: price * 100,
                         },
                         quantity: cart.quantity,
                     }
                 }),
                 customer: customer.id,
-                success_url: "http://127.0.0.1:5173/success",
-                cancel_url: "http://127.0.0.1:5173/cancel",
+                success_url: "http://localhost:3000/success",
+                cancel_url: "http://localhost:3000/error-pay",
             });
 
             res.json({ url: session.url });
@@ -88,9 +89,12 @@ const createOrder = async (customer, data) => {
         const cartFilter = carts.filter(cart => cart.user.id === +user);
 
         for (const cart of cartFilter) {
+            const rise_price= +cart.price - +cart.product_price
             const order = new OrdersEntity()
             order.quantity = cart.quantity
-            order.price = cart.price
+            order.total_price = cart.price
+            order.product_price= cart.product_price
+            order.rise_price= String(rise_price)
             order.products = cart.products
             order.punkt = punkt
             order.phone = phone
@@ -99,6 +103,7 @@ const createOrder = async (customer, data) => {
             order.company = cart.company
             await AppDataSource.manager.save(order)
         }
+        await AppDataSource.getRepository(CartEntity).remove(cartFilter);
         console.log("Processed Order: Yaratildi");
     } catch (err) {
         console.log(err);

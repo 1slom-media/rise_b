@@ -18,6 +18,10 @@ export class CartEntity {
     @IsString()
     price: string
 
+    @Column({ type: "varchar",nullable:true })
+    @IsString()
+    product_price: string
+
     @Column({ type: "jsonb",nullable:true })
     indeks: object[]
 
