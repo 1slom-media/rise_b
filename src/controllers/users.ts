@@ -63,7 +63,7 @@ class UsersController {
 
     // signup phone
     public async SignUpPhone(req: Request, res: Response) {
-        const { phone } = req.body
+        const { name,surname,phone } = req.body
 
         const foundUser = await AppDataSource.getRepository(UsersEntity).find({
             where: { phone }
@@ -74,7 +74,7 @@ class UsersController {
         })
 
         if (!foundUser.length) {
-            const user = await AppDataSource.getRepository(UsersEntity).createQueryBuilder().insert().into(UsersEntity).values({ phone }).returning("*").execute()
+            const user = await AppDataSource.getRepository(UsersEntity).createQueryBuilder().insert().into(UsersEntity).values({ name,surname,phone }).returning("*").execute()
             const code = randomNum();
             redis.set(phone, code, 'EX', 120);
             sms.send(phone, `Для завершения процедуры регистрации на https://rise-shopping.uz пожалуйста, введите код: ${code}`)
@@ -184,7 +184,7 @@ class UsersController {
 
     // signup email
     public async SignUpEmail(req: Request, res: Response) {
-        const { email } = req.body
+        const { name,surname,email } = req.body
 
         const foundUser = await AppDataSource.getRepository(UsersEntity).find({
             where: { email }
@@ -195,7 +195,7 @@ class UsersController {
         })
 
         if (!foundUser.length) {
-            const user = await AppDataSource.getRepository(UsersEntity).createQueryBuilder().insert().into(UsersEntity).values({ email }).returning("*").execute()
+            const user = await AppDataSource.getRepository(UsersEntity).createQueryBuilder().insert().into(UsersEntity).values({ name,surname,email }).returning("*").execute()
             const code = randomNum();
             redis.set(email, code, 'EX', 120);
             Mail({
