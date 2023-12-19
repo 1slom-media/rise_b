@@ -121,7 +121,7 @@ export const webhookRouter = async (req: Request, res: Response) => {
 
         try {
             event = stripe.webhooks.constructEvent(
-                req.body,
+                (req as any).rawBody,
                 signature,
                 webhookSecret
             );

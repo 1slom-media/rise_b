@@ -1,4 +1,5 @@
 import express, { Router } from "express";
+const bodyParser = require('body-parser');
 import users from "../controllers/users";
 import checkToken from "../middlewares/checkToken";
 import country from "../controllers/country";
@@ -137,6 +138,6 @@ router.post("/orders",checkToken, order.Post);
 
 // stripe
 router.post("/create-checkout-session",stripe.Post);
-router.post("/stripe/webhook",express.json({ type: "application/json" }),webhookRouter);
+router.post("/stripe/webhook",express.raw({ type: "application/json" }),webhookRouter);
 
 export default router;
