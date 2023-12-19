@@ -1,5 +1,4 @@
 import express, { Router } from "express";
-const bodyParser = require('body-parser');
 import users from "../controllers/users";
 import checkToken from "../middlewares/checkToken";
 import country from "../controllers/country";

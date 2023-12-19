@@ -25,7 +25,7 @@ class StripeController {
                     quantity: cart.quantity,
                     price: cart.price,
                     products: cart.products.id,
-                    company:cart.company,
+                    company: cart.company,
                 };
             });
 
@@ -33,8 +33,8 @@ class StripeController {
                 metadata: {
                     user: user,
                     cart: JSON.stringify(truncatedCart),
-                    phone:phone,
-                    punkt:punkt
+                    phone: phone,
+                    punkt: punkt
                 },
             });
 
@@ -47,7 +47,7 @@ class StripeController {
                             currency: "usd",
                             product_data: {
                                 name: cart.products.name_uz,
-                                description:cart.products.description_uz,
+                                description: cart.products.description_uz,
                                 metadata: {
                                     id: cart.id,
                                 },
@@ -79,7 +79,7 @@ const createOrder = async (customer, data) => {
         const phone = customer.metadata.phone;
         const punkt = customer.metadata.punkt;
         console.log(customer.metadata);
-        
+
         const carts = await AppDataSource.getRepository(CartEntity).find({
             relations: [
                 'products', 'products.parametrs', 'products.brand', 'user'
@@ -112,17 +112,17 @@ export const webhookRouter = async (req: Request, res: Response) => {
 
     // Check if webhook signing is configured.
     let webhookSecret;
-    webhookSecret = process.env.STRIPE_WEB_HOOK;
+    // webhookSecret = process.env.STRIPE_WEB_HOOK;
 
     if (webhookSecret) {
         // Retrieve the event by verifying the signature using the raw body and secret.
         let event;
-        let signature = req.headers["stripe-signature"];
+        const sig = req.headers['stripe-signature'];
 
         try {
             event = stripe.webhooks.constructEvent(
-                (req as any).rawBody,
-                signature,
+                req.body,
+                sig,
                 webhookSecret
             );
         } catch (err) {

@@ -4,7 +4,6 @@ import session from 'express-session';
 import passport from './utils/gf';
 import { AppDataSource } from './data-source';
 import router from './routes';
-import * as bodyParser from 'body-parser';
 import path from 'path';
 
 const app: Application = express();
@@ -12,7 +11,6 @@ const app: Application = express();
 const PORT = process.env.PORT || 5000
 
 app.use(express.json());
-app.use(bodyParser.json({ verify: (req, res, buf) => { (req as any).rawBody = buf; } }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
