@@ -16,8 +16,8 @@ class UsersController {
     public async Get(req: Request, res: Response): Promise<void> {
         res.json(await AppDataSource.getRepository(UsersEntity).find({
             order: { id: "ASC" }, relations: {
-                cards: true,
-                cart: true
+                cart: true,
+                orders: true
             }
         }));
     }
@@ -29,7 +29,7 @@ class UsersController {
         res.json(await AppDataSource.getRepository(UsersEntity).find({
             where: { id: +id }, relations: {
                 cart: true,
-                cards: true
+                orders: true
             }
         }));
     }
@@ -98,8 +98,6 @@ class UsersController {
         }
 
     }
-
-
 
     // verify phone
     public async VerifyPhone(req: Request, res: Response) {
@@ -333,7 +331,7 @@ class UsersController {
     public async Put(req: Request, res: Response) {
         try {
             const { id } = req.params
-            let { email, phone, password, name, surname } = req.body
+            let { email, phone, password, name, surname, long, lat } = req.body
 
             if (password) {
                 password = await hashed(password)
@@ -346,6 +344,8 @@ class UsersController {
             user.password = password != undefined ? password : user.password
             user.name = name != undefined ? name : user.name
             user.surname = surname != undefined ? surname : user.surname
+            user.long = long != undefined ? long : user.long
+            user.lat = lat != undefined ? lat : user.lat
 
             await AppDataSource.manager.save(user)
 
@@ -449,15 +449,15 @@ class UsersController {
                     .returning("*")
                     .execute()
 
-                    res.json({
-                        status: 200,
-                        message: "User verifay false",
-                    })
-            }else{
+                res.json({
+                    status: 200,
+                    message: "User verifay false",
+                })
+            } else {
                 res.json({
                     status: 404,
                     message: "User not found",
-                }) 
+                })
             }
         } catch (error) {
             res.json({

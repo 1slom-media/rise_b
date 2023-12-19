@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../data-source';
 import { CartEntity } from '../entities/cart';
+import { ProductsEntity } from '../entities/products';
 
 class CartController {
     public async Get(req: Request, res: Response): Promise<void> {
@@ -37,12 +38,18 @@ class CartController {
     public async Post(req: Request, res: Response) {
         const { quantity, products, indeks, user, price} = req.body
 
+        const productsFind = await AppDataSource.getRepository(ProductsEntity).find({
+            where:{id:+products},relations:{
+                company:true
+            }
+        })
         const cart = new CartEntity()
         cart.quantity = quantity
         cart.products = products
         cart.indeks = indeks
         cart.price = price
         cart.user = user
+        cart.company=productsFind[0]?.company
 
         await AppDataSource.manager.save(cart)
 

@@ -23,6 +23,7 @@
       "@types/node": "^16.11.10",
       "@types/passport": "^1.0.12",
       "@types/passport-facebook": "^3.0.0",
+      "@types/stripe": "^8.0.417",
       "bcrypt": "^5.1.1",
       "class-validator": "^0.14.0",
       "jsonwebtoken": "^9.0.2",
@@ -46,6 +47,7 @@
       "passport-google-oauth20": "^2.0.0",
       "pg": "^8.4.0",
       "reflect-metadata": "^0.1.13",
+      "stripe": "^14.9.0",
       "typeorm": "0.3.12"
    }
 }

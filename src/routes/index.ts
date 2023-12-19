@@ -1,4 +1,4 @@
-import { Router } from "express";
+import express, { Router } from "express";
 import users from "../controllers/users";
 import checkToken from "../middlewares/checkToken";
 import country from "../controllers/country";
@@ -8,7 +8,6 @@ import category from "../controllers/category";
 import admin from "../controllers/admin";
 import sub_category from "../controllers/sub_category";
 import brand from "../controllers/brand";
-import cards from "../controllers/cards";
 import size from "../controllers/size";
 import products from "../controllers/products";
 import parametrs from "../controllers/parametrs";
@@ -16,6 +15,8 @@ import prices from "../controllers/prices";
 import charactics from "../controllers/charactics";
 import cart from "../controllers/cart";
 import banner from "../controllers/banner";
+import order from "../controllers/order";
+import stripe, { webhookRouter } from "../controllers/stripe";
 
 const router = Router()
 
@@ -41,7 +42,7 @@ router.post("/resend-phone", users.ResendCodePhone);
 router.post("/google", users.SignGoogle);
 router.put("/users/:id", checkToken, users.Put);
 router.delete("/logout/:id", checkToken, users.LogOut);
-router.post("/forgot-password",users.ForgotPassword);
+router.post("/forgot-password", users.ForgotPassword);
 
 // route country
 router.get("/country", country.Get);
@@ -67,15 +68,15 @@ router.delete("/category/:id", checkToken, category.Delete);
 // route sub_category
 router.get("/sub_category", sub_category.Get);
 router.get("/sub_category/:id", sub_category.GetId);
-router.post("/sub_category",upload.single('image'), checkToken, sub_category.Post);
-router.put("/sub_category/:id",upload.single('image'), checkToken, sub_category.Put);
+router.post("/sub_category", upload.single('image'), checkToken, sub_category.Post);
+router.put("/sub_category/:id", upload.single('image'), checkToken, sub_category.Put);
 router.delete("/sub_category/:id", checkToken, sub_category.Delete);
 
 // route banner
 router.get("/banner", banner.Get);
 router.get("/banner/:id", banner.GetId);
-router.post("/banner",upload.single('image'), checkToken, banner.Post);
-router.put("/banner/:id",upload.single('image'), checkToken, banner.Put);
+router.post("/banner", upload.single('image'), checkToken, banner.Post);
+router.put("/banner/:id", upload.single('image'), checkToken, banner.Put);
 router.delete("/banner/:id", checkToken, banner.Delete);
 
 // route brand
@@ -91,13 +92,6 @@ router.get("/cart/:id", cart.GetId);
 router.post("/cart", checkToken, cart.Post);
 router.put("/cart/:id", checkToken, cart.Put);
 router.delete("/cart/:id", checkToken, cart.Delete);
-
-// route cards
-router.get("/cards", cards.Get);
-router.get("/cards/:id", cards.GetId);
-router.post("/cards", checkToken, cards.Post);
-router.put("/cards/:id", checkToken, cards.Put);
-router.delete("/cards/:id", checkToken, cards.Delete);
 
 // route size
 router.get("/size", size.Get);
@@ -134,5 +128,15 @@ router.get("/parametrs/:id", parametrs.GetId);
 router.post("/parametrs", upload.fields([{ name: 'image1' }, { name: 'image2' }, { name: 'image3' }, { name: 'image4' }]), checkToken, parametrs.Post);
 router.put("/parametrs/:id", upload.fields([{ name: 'image1' }, { name: 'image2' }, { name: 'image3' }, { name: 'image4' }]), checkToken, parametrs.Put);
 router.delete("/parametrs/:id", checkToken, parametrs.Delete);
+
+router.get("/orders", order.Get);
+router.get("/orders/:id", order.GetId);
+router.post("/orders",checkToken, order.Post);
+// router.put("/orders/:id", upload.fields([{ name: 'image1' }, { name: 'image2' }, { name: 'image3' }, { name: 'image4' }]), checkToken, order.Put);
+// router.delete("/orders/:id", checkToken, order.Delete);
+
+// stripe
+router.post("/create-checkout-session",stripe.Post);
+router.post("/stripe/webhook",express.json({ type: "application/json" }),webhookRouter);
 
 export default router;

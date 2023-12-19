@@ -9,6 +9,7 @@ import { PricesEntity } from "./prices";
 import { CharacticsEntity } from "./charactics";
 import { CartEntity } from "./cart";
 import { CountryEntity } from "./country";
+import { OrdersEntity } from "./order";
 
 
 @Entity({ name: "products" })
@@ -101,4 +102,7 @@ export class ProductsEntity {
 
     @OneToMany(() => CartEntity, (cart) => cart.products, { onDelete: "CASCADE", onUpdate: "CASCADE" })
     cart: CartEntity[]
+
+    @OneToMany(() => OrdersEntity, (orders) => orders.products, { onDelete: "CASCADE", onUpdate: "CASCADE" })
+    orders: OrdersEntity[]
 } 

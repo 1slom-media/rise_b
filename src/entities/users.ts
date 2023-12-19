@@ -1,7 +1,7 @@
 import { IsEmail, IsString } from "class-validator";
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from "typeorm";
-import { CardsEntity } from "./cards";
 import { CartEntity } from "./cart";
+import { OrdersEntity } from "./order";
 
 
 
@@ -30,6 +30,12 @@ export class UsersEntity {
     @Column({ type: "varchar", nullable: true })
     password: string;
 
+    @Column({ type: "varchar", nullable: true })
+    long: string;
+
+    @Column({ type: "varchar", nullable: true })
+    lat: string;
+
     @Column({ type: "boolean", default: false })
     verify: boolean;
 
@@ -39,9 +45,9 @@ export class UsersEntity {
     @UpdateDateColumn({ type: "timestamp" })
     updateAt: Date;
 
-    @OneToMany(() => CardsEntity, (cards) => cards.user,{onDelete:"CASCADE",onUpdate:"CASCADE"})
-    cards: CardsEntity[]
-
     @OneToMany(() => CartEntity, (cart) => cart.user,{onDelete:"CASCADE",onUpdate:"CASCADE"})
     cart: CartEntity[]
+
+    @OneToMany(() => OrdersEntity, (orders) => orders.user,{onDelete:"CASCADE",onUpdate:"CASCADE"})
+    orders: OrdersEntity[]
 }
