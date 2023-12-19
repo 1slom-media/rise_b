@@ -10,7 +10,7 @@ class CartController {
         if (userId && +userId > 0){
             const carts=await AppDataSource.getRepository(CartEntity).find({
                 order: { id: "ASC" }, relations: [
-                    'products','products.parametrs','products.brand','user'
+                    'products','products.parametrs','company','user'
                 ]
             });
 
@@ -18,7 +18,7 @@ class CartController {
         }else{
             res.json(await AppDataSource.getRepository(CartEntity).find({
                 order: { id: "ASC" }, relations: [
-                    'products','products.parametrs','products.brand','user'
+                    'products','products.parametrs','company','user'
                 ]
             }));
         }
@@ -30,7 +30,8 @@ class CartController {
         res.json(await AppDataSource.getRepository(CartEntity).find({
             where: { id: +id }, relations: {
                 products: true,
-                user: true
+                user: true,
+                company:true
             }
         }));
     }

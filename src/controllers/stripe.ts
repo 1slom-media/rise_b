@@ -83,7 +83,7 @@ const createOrder = async (customer, data) => {
 
         const carts = await AppDataSource.getRepository(CartEntity).find({
             relations: [
-                'products', 'products.parametrs', 'products.brand', 'user'
+                'products', 'products.parametrs', 'company', 'user'
             ]
         })
         const cartFilter = carts.filter(cart => cart.user.id === +user);

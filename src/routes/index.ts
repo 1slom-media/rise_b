@@ -130,6 +130,7 @@ router.put("/parametrs/:id", upload.fields([{ name: 'image1' }, { name: 'image2'
 router.delete("/parametrs/:id", checkToken, parametrs.Delete);
 
 router.get("/orders", order.Get);
+router.get("/admin-orders", order.GetStatus);
 router.get("/orders/:id", order.GetId);
 // router.post("/orders",checkToken, order.Post);
 router.delete("/orders/:id",checkToken, order.Refund);

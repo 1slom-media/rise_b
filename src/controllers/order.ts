@@ -9,67 +9,87 @@ class OrdersController {
 
         if (userId && +userId > 0) {
             const carts = await AppDataSource.getRepository(OrdersEntity).find({
-                order: { id: "ASC" }, relations: [
-                    'products', 'products.parametrs', 'products.brand', 'user'
+                order: { id: "DESC" }, relations: [
+                    'products', 'products.parametrs', 'user','company'
                 ]
             });
 
             res.json(carts.filter(cart => cart.user.id === +userId));
         } else {
             res.json(await AppDataSource.getRepository(OrdersEntity).find({
-                order: { id: "ASC" }, relations: [
-                    'products', 'products.parametrs', 'products.brand', 'user'
+                order: { id: "DESC" }, relations: [
+                    'products', 'products.parametrs', 'user'
                 ]
             }));
         }
+    }
+
+    public async GetStatus(req: Request, res: Response): Promise<void> {
+        const { status, company } = req.query;
+
+        let query = AppDataSource.getRepository(OrdersEntity)
+            .createQueryBuilder("orders")
+            .leftJoinAndSelect('orders.products', 'products')
+            .leftJoinAndSelect('products.parametrs', 'parametrs')
+            .leftJoinAndSelect('orders.company', 'company')
+            .leftJoinAndSelect('orders.user', 'user');
+
+        if (status) {
+            query = query.andWhere("orders.status = :status", { status: status });
+        }
+        if (company && +company > 0) {
+            query = query.andWhere("company.id = :company", { company: company });
+        }
+
+        const orderList = await query.orderBy('orders.id', 'DESC').getMany();
+        res.json(orderList);
     }
 
     public async GetId(req: Request, res: Response): Promise<void> {
         const { id } = req.params
 
         res.json(await AppDataSource.getRepository(OrdersEntity).find({
-            where: { id: +id }, relations: {
-                products: true,
-                user: true
-            }
+            where: { id: +id }, relations: [
+                'products', 'products.parametrs', 'company', 'user'
+            ]
         }));
     }
 
-    // public async Post(req: Request, res: Response) {
-    //     const { user, punkt, phone } = req.body
+    public async Post(req: Request, res: Response) {
+        const { user, punkt, phone } = req.body
 
-    //     const carts = await AppDataSource.getRepository(CartEntity).find({
-    //         relations: [
-    //             'products', 'products.parametrs', 'products.brand', 'user'
-    //         ]
-    //     })
+        const carts = await AppDataSource.getRepository(CartEntity).find({
+            relations: [
+                'products', 'products.parametrs', 'company', 'user'
+            ]
+        })
 
-    //     const cartFilter = carts.filter(cart => cart.user.id === +user);
+        const cartFilter = carts.filter(cart => cart.user.id === +user);
 
-    //     for (const cart of cartFilter) {
-    //         const rise_price = +cart.price - +cart.product_price
-    //         const order = new OrdersEntity()
-    //         order.quantity = cart.quantity
-    //         order.total_price = cart.price
-    //         order.product_price = cart.product_price
-    //         order.rise_price = String(rise_price)
-    //         order.products = cart.products
-    //         order.punkt = punkt
-    //         order.phone = phone
-    //         order.user = user
-    //         order.indeks = cart.indeks
-    //         order.company = cart.company
-    //         await AppDataSource.manager.save(order)
-    //     }
+        for (const cart of cartFilter) {
+            const rise_price = +cart.price - +cart.product_price
+            const order = new OrdersEntity()
+            order.quantity = cart.quantity
+            order.total_price = cart.price
+            order.product_price = cart.product_price
+            order.rise_price = String(rise_price)
+            order.products = cart.products
+            order.punkt = punkt
+            order.phone = phone
+            order.user = user
+            order.indeks = cart.indeks
+            order.company = cart.company
+            await AppDataSource.manager.save(order)
+        }
 
-    //     await AppDataSource.getRepository(CartEntity).remove(cartFilter);
+        // await AppDataSource.getRepository(CartEntity).remove(cartFilter);
 
 
-    //     res.json({
-    //         status: 201,
-    //         message: "order created"
-    //     })
-    // }
+        res.json({
+            status: 201,
+            message: "order created"
+        })
+    }
 
     // public async Put(req: Request, res: Response) {
     //     try {
@@ -101,21 +121,21 @@ class OrdersController {
     //     }
     // }
 
-    // public async Delete(req: Request, res: Response) {
-    //     try {
-    //         const { id } = req.params
+    public async Delete(req: Request, res: Response) {
+        try {
+            const { id } = req.params
 
-    //         const cart = await AppDataSource.getRepository(OrdersEntity).createQueryBuilder().delete().from(OrdersEntity).where({ id }).returning("*").execute()
+            const cart = await AppDataSource.getRepository(OrdersEntity).createQueryBuilder().delete().from(OrdersEntity).where({ id }).returning("*").execute()
 
-    //         res.json({
-    //             status: 200,
-    //             message: "cart deleted",
-    //             data: cart.raw[0]
-    //         })
-    //     } catch (error) {
-    //         console.log(error);
-    //     }
-    // }
+            res.json({
+                status: 200,
+                message: "cart deleted",
+                data: cart.raw[0]
+            })
+        } catch (error) {
+            console.log(error);
+        }
+    }
 
     public async Refund(req: Request, res: Response) {
         try {
