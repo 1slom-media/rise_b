@@ -4,12 +4,13 @@ import dotenv from 'dotenv'
 import { AppDataSource } from "../data-source";
 import { CartEntity } from "../entities/cart";
 import { OrdersEntity } from "../entities/order";
+import { ProductsEntity } from "../entities/products";
+import { ParametrsEntity } from "../entities/parametrs";
 dotenv.config()
 
 const stripe = new Stripe(process.env.STRIPE_PRIVATE_KEY);
 
 class StripeController {
-
     public async Post(req: Request, res: Response) {
         try {
             const { user, punkt, phone } = req.body
@@ -42,7 +43,7 @@ class StripeController {
                 payment_method_types: ["card"],
                 mode: "payment",
                 line_items: cartFilter.map((cart: any) => {
-                    const price=+cart.price / + cart.quantity
+                    const price = +cart.price / + cart.quantity
                     return {
                         price_data: {
                             currency: "usd",
@@ -68,8 +69,6 @@ class StripeController {
             res.status(500).json({ error: (e as Error).message });
         }
     }
-
-
 }
 
 // Create order function
@@ -79,7 +78,7 @@ const createOrder = async (customer, data) => {
         const user = customer.metadata.user;
         const phone = customer.metadata.phone;
         const punkt = customer.metadata.punkt;
-        console.log(customer.metadata);
+        // console.log(customer.metadata);
 
         const carts = await AppDataSource.getRepository(CartEntity).find({
             relations: [
@@ -89,21 +88,36 @@ const createOrder = async (customer, data) => {
         const cartFilter = carts.filter(cart => cart.user.id === +user);
 
         for (const cart of cartFilter) {
-            const rise_price= +cart.price - +cart.product_price
+            const rise_price = +cart.price - +cart.product_price
             const order = new OrdersEntity()
             order.quantity = cart.quantity
             order.total_price = cart.price
-            order.product_price= cart.product_price
-            order.rise_price= String(rise_price)
+            order.product_price = cart.product_price
+            order.rise_price = String(rise_price)
             order.products = cart.products
             order.punkt = punkt
             order.phone = phone
             order.user = user
             order.indeks = cart.indeks
             order.company = cart.company
-            await AppDataSource.manager.save(order)
+            await AppDataSource.manager.save(order);
+
+            const productId = cart.products.id;
+            const updatedProduct = await AppDataSource.getRepository(ProductsEntity).findOne({ where: { id: productId }, relations: ["parametrs"] });
+
+            for (const indeks of cart.indeks) {
+                const orderColor = indeks["color"];
+                const matchingParam = updatedProduct.parametrs.find(param => param.color === orderColor)
+                const parametrs = await AppDataSource.getRepository(ParametrsEntity).findOne({ where: { id: matchingParam.id } });
+
+                const count = +parametrs.count - +indeks['count']
+                parametrs.count = count.toLocaleString();
+
+                await AppDataSource.manager.save(parametrs);
+            }
         }
         await AppDataSource.getRepository(CartEntity).remove(cartFilter);
+
         console.log("Processed Order: Yaratildi");
     } catch (err) {
         console.log(err);
@@ -162,7 +176,6 @@ export const webhookRouter = async (req: Request, res: Response) => {
 
     res.status(200).end();
 }
-
 
 export default new StripeController();
 

@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import { AppDataSource } from '../data-source';
 import { OrdersEntity } from '../entities/order';
 import { CartEntity } from '../entities/cart';
+import { ProductsEntity } from '../entities/products';
+import { ParametrsEntity } from '../entities/parametrs';
 
 class OrdersController {
     public async Get(req: Request, res: Response): Promise<void> {
@@ -10,7 +12,7 @@ class OrdersController {
         if (userId && +userId > 0) {
             const carts = await AppDataSource.getRepository(OrdersEntity).find({
                 order: { id: "DESC" }, relations: [
-                    'products', 'products.parametrs', 'user','company'
+                    'products', 'products.parametrs', 'company', 'user'
                 ]
             });
 
@@ -18,7 +20,7 @@ class OrdersController {
         } else {
             res.json(await AppDataSource.getRepository(OrdersEntity).find({
                 order: { id: "DESC" }, relations: [
-                    'products', 'products.parametrs', 'user'
+                    'products', 'products.parametrs', 'company', 'user'
                 ]
             }));
         }
@@ -57,7 +59,6 @@ class OrdersController {
 
     public async Post(req: Request, res: Response) {
         const { user, punkt, phone } = req.body
-
         const carts = await AppDataSource.getRepository(CartEntity).find({
             relations: [
                 'products', 'products.parametrs', 'company', 'user'
@@ -79,11 +80,24 @@ class OrdersController {
             order.user = user
             order.indeks = cart.indeks
             order.company = cart.company
-            await AppDataSource.manager.save(order)
+            await AppDataSource.manager.save(order);
+
+            const productId = cart.products.id;
+            const updatedProduct = await AppDataSource.getRepository(ProductsEntity).findOne({ where: { id: productId }, relations: ["parametrs"] });
+
+            for (const indeks of cart.indeks) {
+                const orderColor = indeks["color"];
+                const matchingParam = updatedProduct.parametrs.find(param => param.color === orderColor)
+                const parametrs = await AppDataSource.getRepository(ParametrsEntity).findOne({ where: { id: matchingParam.id } });
+
+                const count = +parametrs.count - +indeks['count']
+                parametrs.count = count.toLocaleString();
+
+                await AppDataSource.manager.save(parametrs);
+            }
         }
 
-        // await AppDataSource.getRepository(CartEntity).remove(cartFilter);
-
+        await AppDataSource.getRepository(CartEntity).remove(cartFilter);
 
         res.json({
             status: 201,
@@ -137,12 +151,76 @@ class OrdersController {
         }
     }
 
+    // order yetib keldi
+    public async Secces(req: Request, res: Response) {
+        try {
+            const { id } = req.params
+
+            const order = await AppDataSource.getRepository(OrdersEntity).createQueryBuilder().update(OrdersEntity)
+                .set({ status: "success" })
+                .where({ id })
+                .returning("*")
+                .execute()
+
+            res.json({
+                status: 200,
+                message: "order refusal",
+                data: order.raw[0]
+            })
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    // tavar kutish xolatida
+    public async Waiting(req: Request, res: Response) {
+        try {
+            const { id } = req.params
+
+            const order = await AppDataSource.getRepository(OrdersEntity).createQueryBuilder().update(OrdersEntity)
+                .set({ status: "waiting" })
+                .where({ id })
+                .returning("*")
+                .execute()
+
+            res.json({
+                status: 200,
+                message: "order refusal",
+                data: order.raw[0]
+            })
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    // order qaytarilmoqchi
     public async Refund(req: Request, res: Response) {
         try {
             const { id } = req.params
 
             const order = await AppDataSource.getRepository(OrdersEntity).createQueryBuilder().update(OrdersEntity)
                 .set({ status: "refund" })
+                .where({ id })
+                .returning("*")
+                .execute()
+
+            res.json({
+                status: 200,
+                message: "order refusal",
+                data: order.raw[0]
+            })
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    // order qaytarildi
+    public async Refunded(req: Request, res: Response) {
+        try {
+            const { id } = req.params
+
+            const order = await AppDataSource.getRepository(OrdersEntity).createQueryBuilder().update(OrdersEntity)
+                .set({ status: "refunded" })
                 .where({ id })
                 .returning("*")
                 .execute()

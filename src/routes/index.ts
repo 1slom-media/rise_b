@@ -134,7 +134,10 @@ router.get("/admin-orders", order.GetStatus);
 router.get("/orders/:id", order.GetId);
 // router.post("/orders",checkToken, order.Post);
 router.delete("/orders/:id",checkToken, order.Refund);
-// router.delete("/orders/:id", checkToken, order.Delete);
+router.delete("/orders-refunded/:id",checkToken, order.Refunded);
+router.delete("/orders-success/:id",checkToken, order.Secces);
+router.delete("/orders-waiting/:id",checkToken, order.Waiting);
+router.delete("/orders/:id", checkToken, order.Delete);
 
 // stripe
 router.post("/create-checkout-session",stripe.Post);
