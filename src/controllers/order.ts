@@ -36,7 +36,7 @@ class OrdersController {
             .leftJoinAndSelect('orders.company', 'company')
             .leftJoinAndSelect('orders.user', 'user');
 
-        if (status) {
+        if (status && +status.length>1) {
             query = query.andWhere("orders.status = :status", { status: status });
         }
         if (company && +company > 0) {
