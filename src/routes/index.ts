@@ -17,6 +17,7 @@ import cart from "../controllers/cart";
 import banner from "../controllers/banner";
 import order from "../controllers/order";
 import stripe, { webhookRouter } from "../controllers/stripe";
+import count from "../controllers/count";
 
 const router = Router()
 
@@ -142,5 +143,11 @@ router.delete("/orders/:id", checkToken, order.Delete);
 // stripe
 router.post("/create-checkout-session",stripe.Post);
 router.post("/stripe/webhook",express.raw({ type: "application/json" }),webhookRouter);
+
+// dashboard
+router.get("/dashboard-products",count.Products);
+router.get("/dashboard-users",count.Users);
+router.get("/dashboard-company",count.Companies);
+router.get("/dashboard-orders",count.Orders);
 
 export default router;
