@@ -6,7 +6,7 @@ import { Like } from 'typeorm';
 
 class ProductsController {
     public async Get(req: Request, res: Response): Promise<void> {
-        const { brand, category, subcategory, color, size, min, max, country, sort, summ, skip,take } = req.query;
+        const { brand, category, subcategory, color, size, min, max, country, sort, summ, skip,take,company } = req.query;
         let brandIds: number[] = [];
         let categoryIds: number[] = [];
         let subcategoryIds: number[] = [];
@@ -61,6 +61,9 @@ class ProductsController {
         }
         if (country && +country > 0) {
             query = query.andWhere('country.id = :country_id', { country_id: country });
+        }
+        if (company && +company > 0) {
+            query = query.andWhere('company.id = :company_id', { company_id: company });
         }
         if (min && max && +min >= 0 && +max > 0) {
             query = query
