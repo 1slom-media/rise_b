@@ -6,7 +6,7 @@ import { Like } from 'typeorm';
 
 class ProductsController {
     public async Get(req: Request, res: Response): Promise<void> {
-        const { brand, category, subcategory, color, size, min, max, country, sort, summ, skip,take,company } = req.query;
+        const { brand, category, subcategory, color, size, min, max, country, sort, summ, skip, take, company } = req.query;
         let brandIds: number[] = [];
         let categoryIds: number[] = [];
         let subcategoryIds: number[] = [];
@@ -51,8 +51,8 @@ class ProductsController {
         if (brandIds.length > 0) {
             query = query.andWhere("brand.id IN (:...brandIds)", { brandIds });
         }
-        if(skip && take){
-            query=query.skip(+take*(+skip-1)).take(+take)
+        if (skip && take) {
+            query = query.skip(+take * (+skip - 1)).take(+take)
         }
         if (categoryIds.length > 0) {
             query = query.andWhere("category.id IN (:...categoryIds)", { categoryIds });
@@ -84,7 +84,7 @@ class ProductsController {
             query = query.innerJoin('products.prices', 'price').orderBy('CAST(prices.price AS DECIMAL)', 'ASC');
         }
 
-        const productList = await query.orderBy('products.id','DESC').getMany();
+        const productList = await query.orderBy('products.id', 'DESC').getMany();
         if (color) {
             const filteredProducts = productList.filter(product =>
                 product.parametrs.some(parametr => parametr.color === color)
@@ -102,29 +102,55 @@ class ProductsController {
     }
 
     public async GetSearch(req: Request, res: Response): Promise<void> {
-        let { s } = req.query
+        let { s, company } = req.query
 
         s = s.toString().trim().toLowerCase()
 
-        res.json(await AppDataSource.getRepository(ProductsEntity).find({
-            relations: {
-                category: true,
-                sub_category: true,
-                company: true,
-                brand: true,
-                parametrs: true,
-                charactics: true,
-                prices: true
-            }, where: [{ name_uz: Like(`${s}%`) },
-            { name_en: Like(`${s}%`) },
-            { name_ru: Like(`${s}%`) },
-            { name_tr: Like(`${s}%`) },
-            { name_uz: Like(`%${s}%`) },
-            { name_en: Like(`%${s}%`) },
-            { name_ru: Like(`%${s}%`) },
-            { name_tr: Like(`%${s}%`) },
-            ]
-        }));
+        if (company && +company > 1) {
+            const products = await AppDataSource.getRepository(ProductsEntity).find({
+                relations: {
+                    category: true,
+                    sub_category: true,
+                    company: true,
+                    brand: true,
+                    parametrs: true,
+                    charactics: true,
+                    prices: true
+                }, where: [{ name_uz: Like(`${s}%`) },
+                { name_en: Like(`${s}%`) },
+                { name_ru: Like(`${s}%`) },
+                { name_tr: Like(`${s}%`) },
+                { name_uz: Like(`%${s}%`) },
+                { name_en: Like(`%${s}%`) },
+                { name_ru: Like(`%${s}%`) },
+                { name_tr: Like(`%${s}%`) },
+                ]
+            })
+            res.json(
+                products.filter(product => product.company.id === +company)
+            )
+        }else{
+            res.json(await AppDataSource.getRepository(ProductsEntity).find({
+                relations: {
+                    category: true,
+                    sub_category: true,
+                    company: true,
+                    brand: true,
+                    parametrs: true,
+                    charactics: true,
+                    prices: true
+                }, where: [{ name_uz: Like(`${s}%`) },
+                { name_en: Like(`${s}%`) },
+                { name_ru: Like(`${s}%`) },
+                { name_tr: Like(`${s}%`) },
+                { name_uz: Like(`%${s}%`) },
+                { name_en: Like(`%${s}%`) },
+                { name_ru: Like(`%${s}%`) },
+                { name_tr: Like(`%${s}%`) },
+                ]
+            }));
+        }
+
     }
 
     public async GetId(req: Request, res: Response): Promise<void> {
