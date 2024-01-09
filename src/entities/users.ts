@@ -37,7 +37,10 @@ export class UsersEntity {
     lat: string;
 
     @Column({ type: "boolean", default: false })
-    verify: boolean;
+    isMobile: boolean;
+
+    @Column({ type: "boolean", default: false })
+    isWeb: boolean;
 
     @CreateDateColumn({ type: "timestamp" })
     createdAt: Date;

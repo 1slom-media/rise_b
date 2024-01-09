@@ -40,9 +40,9 @@ class UsersController {
         const foundUser = await AppDataSource.getRepository(UsersEntity).findOne({
             where: { email }
         })
-        const verify = true
+        const isWeb = true
         if (foundUser == null) {
-            const newUser = await AppDataSource.getRepository(UsersEntity).createQueryBuilder().insert().into(UsersEntity).values({ email, name, surname, verify }).returning("*").execute()
+            const newUser = await AppDataSource.getRepository(UsersEntity).createQueryBuilder().insert().into(UsersEntity).values({ email, name, surname, isWeb }).returning("*").execute()
 
             res.status(200).json({
                 status: 200,
@@ -63,7 +63,7 @@ class UsersController {
 
     // signup phone
     public async SignUpPhone(req: Request, res: Response) {
-        const { name,surname,phone } = req.body
+        const { name, surname, phone } = req.body
 
         const foundUser = await AppDataSource.getRepository(UsersEntity).find({
             where: { phone }
@@ -74,7 +74,7 @@ class UsersController {
         })
 
         if (!foundUser.length) {
-            const user = await AppDataSource.getRepository(UsersEntity).createQueryBuilder().insert().into(UsersEntity).values({ name,surname,phone }).returning("*").execute()
+            const user = await AppDataSource.getRepository(UsersEntity).createQueryBuilder().insert().into(UsersEntity).values({ name, surname, phone }).returning("*").execute()
             const code = randomNum();
             redis.set(phone, code, 'EX', 120);
             sms.send(phone, `Для завершения процедуры регистрации на https://rise-shopping.uz пожалуйста, введите код: ${code}`)
@@ -84,7 +84,7 @@ class UsersController {
                 data: user.raw[0],
                 code: code
             })
-        } if (foundUser.length && User?.verify === false) {
+        } if (foundUser.length && User?.isMobile === false || User.isWeb === false) {
             const code = randomNum();
             redis.set(phone, code, 'EX', 120);
             sms.send(phone, `Для завершения процедуры регистрации на https://rise-shopping.uz пожалуйста, введите код: ${code}`)
@@ -101,7 +101,7 @@ class UsersController {
 
     // verify phone
     public async VerifyPhone(req: Request, res: Response) {
-        const { phone, code } = req.body
+        const { phone, code, isWeb, isMobile } = req.body
 
         const foundUser = await AppDataSource.getRepository(UsersEntity).findOne({
             where: { phone }
@@ -110,7 +110,12 @@ class UsersController {
         if (foundUser) {
             const redisCode = await redis.get(phone)
             if (redisCode && redisCode == code) {
-                foundUser.verify = true
+                if (isMobile) {
+                    foundUser.isMobile = true
+                }
+                if (isWeb) {
+                    foundUser.isWeb = true
+                }
                 await AppDataSource.manager.save(foundUser)
 
                 return res
@@ -138,7 +143,7 @@ class UsersController {
             where: { phone }
         })
         const oldCode = await redis.del(phone);
-        if (foundUser && foundUser.verify === false) {
+        if (foundUser && foundUser.isMobile === false || foundUser.isWeb === false) {
             const code = randomNum();
             redis.set(phone, code, 'EX', 120);
             sms.send(phone, `Для завершения процедуры регистрации на https://rise-shopping.uz пожалуйста, введите код: ${code}`)
@@ -184,7 +189,7 @@ class UsersController {
 
     // signup email
     public async SignUpEmail(req: Request, res: Response) {
-        const { name,surname,email } = req.body
+        const { name, surname, email } = req.body
 
         const foundUser = await AppDataSource.getRepository(UsersEntity).find({
             where: { email }
@@ -195,7 +200,7 @@ class UsersController {
         })
 
         if (!foundUser.length) {
-            const user = await AppDataSource.getRepository(UsersEntity).createQueryBuilder().insert().into(UsersEntity).values({ name,surname,email }).returning("*").execute()
+            const user = await AppDataSource.getRepository(UsersEntity).createQueryBuilder().insert().into(UsersEntity).values({ name, surname, email }).returning("*").execute()
             const code = randomNum();
             redis.set(email, code, 'EX', 120);
             Mail({
@@ -213,7 +218,7 @@ class UsersController {
                 data: user.raw[0],
                 code: code
             })
-        } if (foundUser.length && User?.verify === false) {
+        } if (foundUser.length && User?.isMobile === false || User.isWeb === false) {
             const code = randomNum();
             redis.set(email, code, 'EX', 120);
             Mail({
@@ -238,7 +243,7 @@ class UsersController {
 
     // verify email
     public async VerifyEmail(req: Request, res: Response) {
-        const { email, code } = req.body
+        const { email, code, isMobile, isWeb } = req.body
 
         const foundUser = await AppDataSource.getRepository(UsersEntity).findOne({
             where: { email }
@@ -247,7 +252,12 @@ class UsersController {
         if (foundUser) {
             const redisCode = await redis.get(email)
             if (redisCode && redisCode == code) {
-                foundUser.verify = true
+                if (isMobile) {
+                    foundUser.isMobile = true
+                }
+                if (isWeb) {
+                    foundUser.isWeb = true
+                }
                 await AppDataSource.manager.save(foundUser)
 
                 return res
@@ -305,7 +315,7 @@ class UsersController {
             where: { email }
         })
         const oldCode = await redis.del(email);
-        if (foundUser && foundUser.verify === false) {
+        if (foundUser && foundUser.isMobile === false || foundUser.isWeb === false) {
             const code = randomNum();
             redis.set(email, code, 'EX', 120);
             Mail({
@@ -384,12 +394,12 @@ class UsersController {
 
             if (email) {
                 const user = await AppDataSource.getRepository(UsersEntity).createQueryBuilder().update(UsersEntity)
-                    .set({ password: null, verify: false })
+                    .set({ password: null, isWeb: false })
                     .where({ email })
                     .returning("*")
                     .execute()
 
-                if (foundUser.length && User?.verify === false) {
+                if (foundUser.length && User?.isWeb === false) {
                     const code = randomNum();
                     redis.set(email, code, 'EX', 120);
                     Mail({
@@ -410,12 +420,12 @@ class UsersController {
 
             if (phone) {
                 const user = await AppDataSource.getRepository(UsersEntity).createQueryBuilder().update(UsersEntity)
-                    .set({ password: null, verify: false })
+                    .set({ password: null, isWeb: false })
                     .where({ phone })
                     .returning("*")
                     .execute()
 
-                if (foundUserPhone.length && UserPhone?.verify === false) {
+                if (foundUserPhone.length && UserPhone?.isWeb === false) {
                     const code = randomNum();
                     redis.set(phone, code, 'EX', 120);
                     sms.send(phone, `Для завершения процедуры регистрации на https://rise-shopping.uz пожалуйста, введите код: ${code}`)
@@ -437,14 +447,26 @@ class UsersController {
     public async LogOut(req: Request, res: Response) {
         try {
             const { id } = req.params
+            const { isMobile, isWeb } = req.body
 
             const User = await AppDataSource.getRepository(UsersEntity).findOne({
                 where: { id: +id }
             })
 
-            if (User) {
+            if (User && isWeb===false) {
                 const user = await AppDataSource.getRepository(UsersEntity).createQueryBuilder().update(UsersEntity)
-                    .set({ verify: false })
+                    .set({ isWeb })
+                    .where({ id })
+                    .returning("*")
+                    .execute()
+
+                res.json({
+                    status: 200,
+                    message: "User verifay false",
+                })
+            }else if (User && isMobile===false) {
+                const user = await AppDataSource.getRepository(UsersEntity).createQueryBuilder().update(UsersEntity)
+                    .set({ isMobile})
                     .where({ id })
                     .returning("*")
                     .execute()

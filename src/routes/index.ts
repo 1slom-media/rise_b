@@ -42,7 +42,7 @@ router.post("/resend-email", users.ResendCodeEmail);
 router.post("/resend-phone", users.ResendCodePhone);
 router.post("/google", users.SignGoogle);
 router.put("/users/:id", checkToken, users.Put);
-router.delete("/logout/:id", checkToken, users.LogOut);
+router.put("/logout/:id", checkToken, users.LogOut);
 router.post("/forgot-password", users.ForgotPassword);
 
 // route country
