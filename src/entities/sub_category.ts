@@ -3,6 +3,7 @@ import { Entity, PrimaryGeneratedColumn, Column,CreateDateColumn,UpdateDateColum
 import { CategoryEntity } from "./category";
 import { SizeEntity } from "./size";
 import { ProductsEntity } from "./products";
+import { BannerEntity } from "./banner";
 
 @Entity({ name: "sub_category" })
 export class SubCategoryEntity {
@@ -43,4 +44,7 @@ export class SubCategoryEntity {
 
     @OneToMany(() => ProductsEntity, (products) => products.sub_category,{onDelete:"CASCADE",onUpdate:"CASCADE"})
     products: ProductsEntity[]
+
+    @OneToMany(() => BannerEntity, (banner) => banner.sub_category,{onDelete:"CASCADE",onUpdate:"CASCADE"})
+    banner: BannerEntity[]
 }

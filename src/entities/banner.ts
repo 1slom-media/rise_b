@@ -1,5 +1,6 @@
 import { IsString } from "class-validator";
-import { Entity, PrimaryGeneratedColumn, Column,CreateDateColumn,UpdateDateColumn} from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column,CreateDateColumn,UpdateDateColumn, ManyToOne} from "typeorm";
+import { SubCategoryEntity } from "./sub_category";
 
 @Entity({ name: "banner" })
 export class BannerEntity {
@@ -19,4 +20,7 @@ export class BannerEntity {
 
     @UpdateDateColumn({ type: "timestamp" })
     updateAt: Date;
+
+    @ManyToOne(() => SubCategoryEntity, (sub_category) => sub_category.banner, { onDelete: "CASCADE", onUpdate: "CASCADE" })
+    sub_category: SubCategoryEntity
 }
