@@ -82,6 +82,8 @@ class StripeController {
             let amount;
             const truncatedCart = cartFilter.map((cart) => {
                 amount += cart.price
+                console.log(cart.price,"cart");
+                
                 return {
                     id: cart.id,
                     quantity: cart.quantity,
@@ -90,6 +92,8 @@ class StripeController {
                     company: cart.company,
                 };
             });
+
+            console.log(amount,"amount");
 
             const customer = await stripe.customers.create({
                 metadata: {
@@ -101,7 +105,8 @@ class StripeController {
             });
 
             const ephemeralKey = await stripe.ephemeralKeys.create(
-                { customer: customer.id }
+                { customer: customer.id },
+                { apiVersion: '2020-08-27' }
             );
 
             const paymentIntent = await stripe.paymentIntents.create({
