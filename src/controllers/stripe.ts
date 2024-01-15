@@ -79,7 +79,9 @@ class StripeController {
                 ]
             })
             const cartFilter = carts.filter(cart => cart.user.id === +user);
+            let amount;
             const truncatedCart = cartFilter.map((cart) => {
+                amount += cart.price
                 return {
                     id: cart.id,
                     quantity: cart.quantity,
@@ -103,45 +105,19 @@ class StripeController {
             );
 
             const paymentIntent = await stripe.paymentIntents.create({
-                amount: 1099,
+                amount: amount,
                 currency: 'usd',
                 customer: customer.id,
-                // In the latest version of the API, specifying the `automatic_payment_methods` parameter is optional because Stripe enables its functionality by default.
                 automatic_payment_methods: {
                     enabled: true,
                 },
-            });
-
-            const session = await stripe.checkout.sessions.create({
-                payment_method_types: ["card"],
-                mode: "payment",
-                line_items: cartFilter.map((cart: any) => {
-                    const price = +cart.price / + cart.quantity
-                    return {
-                        price_data: {
-                            currency: "usd",
-                            product_data: {
-                                name: cart.products.name_uz,
-                                description: cart.products.description_uz,
-                                metadata: {
-                                    id: cart.id,
-                                },
-                            },
-                            unit_amount: price * 100,
-                        },
-                        quantity: cart.quantity,
-                    }
-                }),
-                customer: customer.id,
-                success_url: "http://localhost:3000/success",
-                cancel_url: "http://localhost:3000/error-pay",
             });
 
             res.json({
                 paymentIntent: paymentIntent.client_secret,
                 ephemeralKey: ephemeralKey.secret,
                 customer: customer.id,
-                publishableKey: 'pk_test_51AROWSJX9HHJ5bycpEUP9dK39tXufyuWogSUdeweyZEXy3LC7M8yc5d9NlQ96fRCVL0BlAu7Nqt4V7N5xZjJnrkp005fDiTMIr'
+                publishableKey: process.env.STRIPE_PUBLESHID_KEY
             });
         } catch (e) {
             res.status(500).json({ error: (e as Error).message });
@@ -250,6 +226,18 @@ export const webhookRouter = async (req: Request, res: Response) => {
                 }
             })
             .catch((err) => console.log(err.message));
+    }
+
+    if (eventType === "payment_intent.succeeded") {
+        // Retrieve customer information
+        const customer = await stripe.customers.retrieve(data.customer);
+
+        try {
+            // CREATE ORDER
+            createOrder(customer, data);
+        } catch (err) {
+            console.log(err);
+        }
     }
 
     res.status(200).end();

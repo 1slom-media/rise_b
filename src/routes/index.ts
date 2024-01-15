@@ -142,6 +142,7 @@ router.delete("/orders/:id", checkToken, order.Delete);
 
 // stripe
 router.post("/create-checkout-session",stripe.Post);
+router.post("/mobile-checkout-session",stripe.PostMobile);
 router.post("/stripe/webhook",express.raw({ type: "application/json" }),webhookRouter);
 
 // dashboard
