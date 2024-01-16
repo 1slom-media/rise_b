@@ -210,7 +210,8 @@ export const webhookRouter = async (req: Request, res: Response) => {
     }
 
     // Handle the checkout.session.completed event
-    if (eventType === "checkout.session.completed") {
+if (eventType === "checkout.session.completed") {
+    if (data.customer) {
         stripe.customers
             .retrieve(data.customer)
             .then(async (customer) => {
@@ -223,9 +224,13 @@ export const webhookRouter = async (req: Request, res: Response) => {
                 }
             })
             .catch((err) => console.log(err.message));
+    } else {
+        console.log('Customer ID is null in the webhook data');
     }
+}
 
-    if (eventType === "payment_intent.succeeded") {
+if (eventType === "payment_intent.succeeded") {
+    if (data.customer) {
         // Retrieve customer information
         const customer = await stripe.customers.retrieve(data.customer);
 
@@ -235,7 +240,11 @@ export const webhookRouter = async (req: Request, res: Response) => {
         } catch (err) {
             console.log(err);
         }
+    } else {
+        console.log('Customer ID is null in the webhook data');
     }
+}
+
 
     res.status(200).end();
 }
