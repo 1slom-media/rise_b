@@ -75,25 +75,22 @@ class StripeController {
             const { user, punkt, phone } = req.body
             const carts = await AppDataSource.getRepository(CartEntity).find({
                 relations: [
-                    'products', 'products.parametrs', 'products.brand', 'user'
+                    'products', 'products.parametrs', 'products.brand', 'user','company'
                 ]
             })
+            
             const cartFilter = carts.filter(cart => cart.user.id === +user);
-            let amount;
+            let amount=0;
             const truncatedCart = cartFilter.map((cart) => {
-                amount += cart.price
-                console.log(cart.price,"cart");
-                
+                amount += Number(cart.price)
                 return {
                     id: cart.id,
                     quantity: cart.quantity,
                     price: cart.price,
                     products: cart.products.id,
-                    company: cart.company,
+                    company: cart.company.company,
                 };
             });
-
-            console.log(amount,"amount");
 
             const customer = await stripe.customers.create({
                 metadata: {
@@ -103,6 +100,7 @@ class StripeController {
                     punkt: punkt
                 },
             });
+            
 
             const ephemeralKey = await stripe.ephemeralKeys.create(
                 { customer: customer.id },
@@ -110,19 +108,13 @@ class StripeController {
             );
 
             const paymentIntent = await stripe.paymentIntents.create({
-                amount: amount,
+                amount: amount*100,
                 currency: 'usd',
-                customer: customer.id,
-                automatic_payment_methods: {
-                    enabled: true,
-                },
+                payment_method_types: ["card"],
             });
 
             res.json({
-                paymentIntent: paymentIntent.client_secret,
-                ephemeralKey: ephemeralKey.secret,
-                customer: customer.id,
-                publishableKey: process.env.STRIPE_PUBLESHID_KEY
+                clientSecret: paymentIntent.client_secret,
             });
         } catch (e) {
             res.status(500).json({ error: (e as Error).message });
