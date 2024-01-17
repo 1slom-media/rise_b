@@ -1,6 +1,7 @@
 import { IsString,IsEmail, Length } from "class-validator";
 import { Entity, PrimaryGeneratedColumn, Column,CreateDateColumn,UpdateDateColumn, ManyToOne, OneToMany } from "typeorm";
 import { CompanyEntity } from "./company";
+import { MessagesEntity } from "./messages";
 
 
 @Entity({ name: "admin" })
@@ -46,5 +47,8 @@ export class AdminEntity {
 
     @ManyToOne(() => CompanyEntity, (company) => company.admin,{onDelete:"CASCADE",onUpdate:"CASCADE"})
     company: CompanyEntity
+
+    @OneToMany(() => MessagesEntity, (messages) => messages.admin,{onDelete:"CASCADE",onUpdate:"CASCADE"})
+    messages: MessagesEntity[]
 
 }

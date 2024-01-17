@@ -18,6 +18,7 @@ import banner from "../controllers/banner";
 import order from "../controllers/order";
 import stripe, { webhookRouter } from "../controllers/stripe";
 import count from "../controllers/count";
+import messages from "../controllers/messages";
 
 const router = Router()
 
@@ -123,6 +124,14 @@ router.post("/charactics", checkToken, charactics.Post);
 router.put("/charactics/:id", checkToken, charactics.Put);
 router.delete("/charactics/:id", checkToken, charactics.Delete);
 
+// route messages
+router.get("/messages-not-read", messages.GetNotRead);
+router.get("/messages-read", messages.GetRead);
+router.get("/messages/:id", messages.GetId);
+router.post("/messages", messages.Post);
+router.put("/messages/:id", messages.Put);
+router.delete("/messages/:id", messages.Delete);
+
 // route parametrs
 router.get("/parametrs", parametrs.Get);
 router.get("/parametrs/:id", parametrs.GetId);
@@ -134,21 +143,21 @@ router.get("/orders", order.Get);
 router.get("/admin-orders", order.GetStatus);
 router.get("/orders/:id", order.GetId);
 // router.post("/orders",checkToken, order.Post);
-router.delete("/orders/:id",checkToken, order.Refund);
-router.delete("/orders-refunded/:id",checkToken, order.Refunded);
-router.delete("/orders-success/:id",checkToken, order.Secces);
-router.delete("/orders-waiting/:id",checkToken, order.Waiting);
+router.delete("/orders/:id", checkToken, order.Refund);
+router.delete("/orders-refunded/:id", checkToken, order.Refunded);
+router.delete("/orders-success/:id", checkToken, order.Secces);
+router.delete("/orders-waiting/:id", checkToken, order.Waiting);
 router.delete("/orders/:id", checkToken, order.Delete);
 
 // stripe
-router.post("/create-checkout-session",stripe.Post);
-router.post("/create-payment-intent",stripe.PostMobile);
-router.post("/stripe/webhook",express.raw({ type: "application/json" }),webhookRouter);
+router.post("/create-checkout-session", stripe.Post);
+router.post("/create-payment-intent", stripe.PostMobile);
+router.post("/stripe/webhook", express.raw({ type: "application/json" }), webhookRouter);
 
 // dashboard
-router.get("/dashboard-products",count.Products);
-router.get("/dashboard-users",count.Users);
-router.get("/dashboard-company",count.Companies);
-router.get("/dashboard-orders",count.Orders);
+router.get("/dashboard-products", count.Products);
+router.get("/dashboard-users", count.Users);
+router.get("/dashboard-company", count.Companies);
+router.get("/dashboard-orders", count.Orders);
 
 export default router;

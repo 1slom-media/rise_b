@@ -2,6 +2,7 @@ import { IsEmail, IsString } from "class-validator";
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from "typeorm";
 import { CartEntity } from "./cart";
 import { OrdersEntity } from "./order";
+import { MessagesEntity } from "./messages";
 
 
 
@@ -53,4 +54,7 @@ export class UsersEntity {
 
     @OneToMany(() => OrdersEntity, (orders) => orders.user,{onDelete:"CASCADE",onUpdate:"CASCADE"})
     orders: OrdersEntity[]
+
+    @OneToMany(() => MessagesEntity, (messages) => messages.users,{onDelete:"CASCADE",onUpdate:"CASCADE"})
+    messages: MessagesEntity[]
 }

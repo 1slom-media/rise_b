@@ -13,6 +13,8 @@ class StaffController {
             order: { id: "ASC" },
             relations: {
                 company: true,
+            },where:{
+                status:"active"
             }
         }));
     }
