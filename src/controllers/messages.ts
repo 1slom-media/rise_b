@@ -3,6 +3,26 @@ import { AppDataSource } from '../data-source';
 import { MessagesEntity } from '../entities/messages';
 
 class MessagesController {
+    public async Get(req: Request, res: Response): Promise<void> {
+        const { userId } = req.query;
+        if (userId && +userId > 0) {
+            const messages = await AppDataSource.getRepository(MessagesEntity).find({
+                order: { id: "ASC" }, relations: {
+                    users: true,
+                    admin: true
+                }
+            })
+
+            res.json(messages.filter(message => message.users.id === +userId));
+        } else {
+            res.json(await AppDataSource.getRepository(MessagesEntity).find({
+                order: { id: "ASC" }, relations: {
+                    users: true,
+                    admin: true
+                }
+            }));
+        }
+    }
     public async GetNotRead(req: Request, res: Response): Promise<void> {
         const { userId } = req.query;
         if (userId && +userId > 0) {

@@ -127,6 +127,7 @@ router.delete("/charactics/:id", checkToken, charactics.Delete);
 // route messages
 router.get("/messages-not-read", messages.GetNotRead);
 router.get("/messages-read", messages.GetRead);
+router.get("/messages", messages.Get);
 router.get("/messages/:id", messages.GetId);
 router.post("/messages", messages.Post);
 router.put("/messages/:id", messages.Put);
