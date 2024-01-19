@@ -106,7 +106,7 @@ class ProductsController {
 
         s = s.toString().trim().toLowerCase()
 
-        if (company && +company > 1) {
+        if (company && +company > 0) {
             const products = await AppDataSource.getRepository(ProductsEntity).find({
                 relations: {
                     category: true,
@@ -126,8 +126,9 @@ class ProductsController {
                 { name_tr: Like(`%${s}%`) },
                 ]
             })
+            const fileteredProducts=products.filter(product => product.company.id === +company)
             res.json(
-                products.filter(product => product.company.id === +company)
+                fileteredProducts
             )
         }else{
             res.json(await AppDataSource.getRepository(ProductsEntity).find({
