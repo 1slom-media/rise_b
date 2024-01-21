@@ -463,7 +463,7 @@ class UsersController {
                 res.json({
                     status: 200,
                     message: "User verifay false",
-                    data:user
+                    data:user.raw[0]
                 })
             }else if (User && isMobile===false) {
                 const user = await AppDataSource.getRepository(UsersEntity).createQueryBuilder().update(UsersEntity)
@@ -475,7 +475,7 @@ class UsersController {
                 res.json({
                     status: 200,
                     message: "User verifay false",
-                    data:user
+                    data:user.raw[0]
                 })
             } else {
                 res.json({
