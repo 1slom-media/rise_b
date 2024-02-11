@@ -1,0 +1,133 @@
+type Query {
+  category: [Category]
+  sub_category: [SubCategory]
+  banner: [Banner]
+  size: [Size]
+  country: [Country]
+  company: [Company]
+  products(
+    brand: [String]
+    category: [String]
+    subcategory: [String]
+    color: String
+    size: String
+    min: String
+    max: String
+    country: String
+    sort: String
+    summ: String
+    skip: String
+    take: String
+    company: String
+  ): [Products]
+  brand: [Brand]
+  prices: [Prices]
+}
+
+type Category {
+  id: Int
+  category_uz: String
+  category_en: String
+  category_ru: String
+  category_tr: String
+  image: String
+  sub_category: [SubCategory]
+  products: [Products]
+  parametrs: [Parametrs]
+}
+
+type Products {
+  id: Int
+  name_uz: String
+  name_en: String
+  name_ru: String
+  name_tr: String
+  size: [String]
+  minimum: String
+  description_uz: String
+  description_en: String
+  description_ru: String
+  description_tr: String
+  delivery_uz: String
+  delivery_en: String
+  delivery_ru: String
+  delivery_tr: String
+  status: String
+  onsale: String
+  category: Category
+  sub_category: SubCategory
+  country: Country
+  company: Company
+  brand: Brand
+  prices: [Prices]
+  parametrs: [Parametrs]
+}
+
+type Parametrs {
+  id: Int
+  color: String
+  image1: String
+  image2: String
+  image3: String
+  image4: String
+  count: String
+  products: Products
+}
+
+type Prices {
+  id: Int
+  min: String
+  max: String
+  price: String
+  products: Products
+}
+
+type Brand {
+  id: Int
+  brand_uz: String
+  brand_en: String
+  brand_ru: String
+  brand_tr: String
+  products: [Products]
+}
+
+type Country {
+  id: Int
+  country_uz: String
+  country_en: String
+  country_ru: String
+  country_tr: String
+  image: String
+}
+
+type Company {
+  id: Int
+  company: String
+  image: String
+}
+
+type SubCategory {
+  id: Int
+  sub_category_uz: String
+  sub_category_en: String
+  sub_category_ru: String
+  sub_category_tr: String
+  image: String
+  category: Category
+  size: [Size]
+  banner: [Banner]
+  products: [Products]
+}
+
+type Size {
+  id: Int
+  size: String
+  sub_category: SubCategory
+}
+
+type Banner {
+  id: Int
+  status: String
+  image: String
+  sub_category: SubCategory
+}
