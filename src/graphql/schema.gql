@@ -114,7 +114,7 @@ type SubCategory {
   sub_category_tr: String
   image: String
   category: Category
-  size: [Size]
+  size: [[Size]]
   banner: [Banner]
   products: [Products]
 }
