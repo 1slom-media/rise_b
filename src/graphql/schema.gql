@@ -10,7 +10,7 @@ type Query {
     category: [String]
     subcategory: [String]
     color: String
-    size: String
+    size: [String]
     min: String
     max: String
     country: String
