@@ -1,6 +1,6 @@
 type Query {
   category: [Category]
-  sub_category: [SubCategory]
+  sub_category(category:String): [SubCategory]
   banner: [Banner]
   size: [Size]
   country: [Country]

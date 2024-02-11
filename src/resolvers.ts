@@ -26,15 +26,18 @@ export const resolvers = {
             })
             return company;
         },
-        sub_category: async () => {
-            const sub_category = await AppDataSource.getRepository(SubCategoryEntity).find({
-                relations: {
-                    category: true,
-                    size: true,
-                    products: true
-                }, order: { id: "ASC" }
-            })
-            return sub_category;
+        sub_category: async (_,{category}) => {
+            let query = AppDataSource.getRepository(SubCategoryEntity)
+                .createQueryBuilder('sub_category')
+                .leftJoinAndSelect('sub_category.category', 'category')
+                .leftJoinAndSelect('sub_category.size', 'size')
+                .leftJoinAndSelect('sub_category.products', 'products').orderBy('sub_category.id', 'ASC')
+
+            if(!category){
+                return await query.getMany();
+            }else{
+                return await query.where("category.id = :category_id",{category_id:category}).getMany();
+            }
         },
         products: async (_, { brand, category, subcategory, color, size, min, max, country, sort, summ, skip, take, company }) => {
             let brandIds: number[] = [];
