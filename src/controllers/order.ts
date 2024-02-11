@@ -16,7 +16,7 @@ class OrdersController {
                 ]
             });
 
-            res.json(carts.filter(cart => cart.user.id === +userId));
+            res.json(carts.filter(cart => cart.user?.id === +userId));
         } else {
             res.json(await AppDataSource.getRepository(OrdersEntity).find({
                 order: { id: "DESC" }, relations: [
