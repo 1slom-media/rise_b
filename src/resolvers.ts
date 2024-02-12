@@ -1,3 +1,4 @@
+import { Like } from "typeorm";
 import { AppDataSource } from "./data-source"
 import { CategoryEntity } from "./entities/category"
 import { CompanyEntity } from "./entities/company";
@@ -26,17 +27,17 @@ export const resolvers = {
             })
             return company;
         },
-        sub_category: async (_,{category}) => {
+        sub_category: async (_, { category }) => {
             let query = AppDataSource.getRepository(SubCategoryEntity)
                 .createQueryBuilder('sub_category')
                 .leftJoinAndSelect('sub_category.category', 'category')
                 .leftJoinAndSelect('sub_category.size', 'size')
                 .leftJoinAndSelect('sub_category.products', 'products').orderBy('sub_category.id', 'ASC')
 
-            if(!category){
+            if (!category) {
                 return await query.getMany();
-            }else{
-                return await query.where("category.id = :category_id",{category_id:category}).getMany();
+            } else {
+                return await query.where("category.id = :category_id", { category_id: category }).getMany();
             }
         },
         products: async (_, { brand, category, subcategory, color, size, min, max, country, sort, summ, skip, take, company }) => {
@@ -131,6 +132,54 @@ export const resolvers = {
                 return lastFilter
             } else {
                 return productList
+            }
+        },
+        search: async (_, { s, company }) => {
+            s = s.toString().trim().toLowerCase();
+            if (company && +company > 0) {
+                const products = await AppDataSource.getRepository(ProductsEntity).find({
+                    relations: {
+                        category: true,
+                        sub_category: true,
+                        company: true,
+                        brand: true,
+                        parametrs: true,
+                        charactics: true,
+                        prices: true
+                    }, where: [{ name_uz: Like(`${s}%`) },
+                    { name_en: Like(`${s}%`) },
+                    { name_ru: Like(`${s}%`) },
+                    { name_tr: Like(`${s}%`) },
+                    { name_uz: Like(`%${s}%`) },
+                    { name_en: Like(`%${s}%`) },
+                    { name_ru: Like(`%${s}%`) },
+                    { name_tr: Like(`%${s}%`) },
+                    ]
+                })
+                const fileteredProducts = products.filter(product => product.company.id === +company)
+
+                return fileteredProducts
+
+            } else {
+                return await AppDataSource.getRepository(ProductsEntity).find({
+                    relations: {
+                        category: true,
+                        sub_category: true,
+                        company: true,
+                        brand: true,
+                        parametrs: true,
+                        charactics: true,
+                        prices: true
+                    }, where: [{ name_uz: Like(`${s}%`) },
+                    { name_en: Like(`${s}%`) },
+                    { name_ru: Like(`${s}%`) },
+                    { name_tr: Like(`${s}%`) },
+                    { name_uz: Like(`%${s}%`) },
+                    { name_en: Like(`%${s}%`) },
+                    { name_ru: Like(`%${s}%`) },
+                    { name_tr: Like(`%${s}%`) },
+                    ]
+                });
             }
         }
     }

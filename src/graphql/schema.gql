@@ -5,6 +5,7 @@ type Query {
   size: [Size]
   country: [Country]
   company: [Company]
+  search(s:String,company:String):[Products]
   products(
     brand: [String]
     category: [String]
