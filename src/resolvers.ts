@@ -4,6 +4,8 @@ import { CategoryEntity } from "./entities/category"
 import { CompanyEntity } from "./entities/company";
 import { ProductsEntity } from "./entities/products";
 import { SubCategoryEntity } from "./entities/sub_category";
+import { CountryEntity } from "./entities/country";
+import { BrandEntity } from "./entities/brand";
 
 export const resolvers = {
     Query: {
@@ -181,6 +183,25 @@ export const resolvers = {
                     ]
                 });
             }
+        },
+        country: async () => {
+            const country = await AppDataSource.getRepository(CountryEntity).find({
+                relations: {
+                    company: true
+                }
+            })
+
+            return country;
+        },
+        brand: async () => {
+            const brand = await AppDataSource.getRepository(BrandEntity).find({
+                order: { id: "ASC" }, relations: {
+                    products: true,
+                    company: true
+                }
+            })
+
+            return brand;
         }
     }
 }

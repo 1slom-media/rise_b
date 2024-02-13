@@ -90,6 +90,7 @@ type Brand {
   brand_ru: String
   brand_tr: String
   products: [Products]
+  company:Company
 }
 
 type Country {
@@ -99,6 +100,7 @@ type Country {
   country_ru: String
   country_tr: String
   image: String
+  company:[Company]
 }
 
 type Company {
