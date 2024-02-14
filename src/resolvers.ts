@@ -42,7 +42,7 @@ export const resolvers = {
                 return await query.where("category.id = :category_id", { category_id: category }).getMany();
             }
         },
-        products: async (_, { brand, category, subcategory, color, size, min, max, country, sort, summ, skip, take, company }) => {
+        products: async (_, { brand, category, subcategory, color, size, min, max, country, sort, summ, skip, take, company,id }) => {
             let brandIds: number[] = [];
             let categoryIds: number[] = [];
             let subcategoryIds: number[] = [];
@@ -112,6 +112,9 @@ export const resolvers = {
             }
             if (sort && sort == "aksiya" || sort == "ommabop" || sort == "new") {
                 query = query.andWhere('products.status=:status', { status: sort })
+            }
+            if (id && +id>0) {
+                query = query.andWhere('products.id=:product_id', { product_id: id })
             }
             if (summ && summ === "max") {
                 query = query.innerJoin('products.prices', 'price').orderBy('CAST(prices.price AS DECIMAL)', 'DESC');
