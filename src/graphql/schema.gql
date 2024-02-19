@@ -61,6 +61,8 @@ type Products {
   country: Country
   company: Company
   brand: Brand
+  createdAt:String
+  updateAt:String
   prices: [Prices]
   parametrs: [Parametrs]
 }
