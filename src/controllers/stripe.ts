@@ -16,7 +16,7 @@ class StripeController {
             const { user, punkt, phone } = req.body
             const carts = await AppDataSource.getRepository(CartEntity).find({
                 relations: [
-                    'products', 'products.parametrs', 'products.brand', 'user','company'
+                    'products', 'products.parametrs', 'products.brand', 'user', 'company'
                 ]
             })
             const cartFilter = carts.filter(cart => cart?.user?.id === +user);
@@ -38,13 +38,14 @@ class StripeController {
                     punkt: punkt
                 },
             });
-            
+
 
             const session = await stripe.checkout.sessions.create({
                 payment_method_types: ["card"],
                 mode: "payment",
                 line_items: cartFilter.map((cart: any) => {
-                    const price = +cart?.price / + cart?.quantity
+                    const price = (+cart?.price / +cart?.quantity).toFixed(2);
+                    const unit_amount = (+price * 100);
                     return {
                         price_data: {
                             currency: "usd",
@@ -55,7 +56,7 @@ class StripeController {
                                     id: cart?.id,
                                 },
                             },
-                            unit_amount: price * 100,
+                            unit_amount: +unit_amount,
                         },
                         quantity: cart?.quantity,
                     }
@@ -76,12 +77,12 @@ class StripeController {
             const { user, punkt, phone } = req.body
             const carts = await AppDataSource.getRepository(CartEntity).find({
                 relations: [
-                    'products', 'products.parametrs', 'products.brand', 'user','company'
+                    'products', 'products.parametrs', 'products.brand', 'user', 'company'
                 ]
             })
-            
+
             const cartFilter = carts.filter(cart => cart?.user?.id === +user);
-            let amount=0;
+            let amount = 0;
             const truncatedCart = cartFilter.map((cart) => {
                 amount += Number(cart?.price)
                 return {
@@ -101,7 +102,7 @@ class StripeController {
                     punkt: punkt
                 },
             });
-            
+
 
             const ephemeralKey = await stripe.ephemeralKeys.create(
                 { customer: customer.id },
@@ -109,8 +110,8 @@ class StripeController {
             );
 
             const paymentIntent = await stripe.paymentIntents.create({
-                amount: amount*100,
-                customer:customer?.id,
+                amount: amount * 100,
+                customer: customer?.id,
                 currency: 'usd',
                 payment_method_types: ["card"],
             });
@@ -210,40 +211,40 @@ export const webhookRouter = async (req: Request, res: Response) => {
     }
 
     // Handle the checkout.session.completed event
-if (eventType === "checkout.session.completed") {
-    if (data.customer) {
-        stripe.customers
-            .retrieve(data.customer)
-            .then(async (customer) => {
-                try {
-                    // CREATE ORDER
-                    createOrder(customer, data);
-                } catch (err) {
-                    console.log(typeof createOrder);
-                    console.log(err);
-                }
-            })
-            .catch((err) => console.log(err.message));
-    } else {
-        console.log('Customer ID is null in the webhook data');
-    }
-}
-
-if (eventType === "payment_intent.succeeded") {
-    if (data.customer) {
-        // Retrieve customer information
-        const customer = await stripe.customers.retrieve(data.customer);
-
-        try {
-            // CREATE ORDER
-            createOrder(customer, data);
-        } catch (err) {
-            console.log(err);
+    if (eventType === "checkout.session.completed") {
+        if (data.customer) {
+            stripe.customers
+                .retrieve(data.customer)
+                .then(async (customer) => {
+                    try {
+                        // CREATE ORDER
+                        createOrder(customer, data);
+                    } catch (err) {
+                        console.log(typeof createOrder);
+                        console.log(err);
+                    }
+                })
+                .catch((err) => console.log(err.message));
+        } else {
+            console.log('Customer ID is null in the webhook data');
         }
-    } else {
-        console.log('Customer ID is null in the webhook data');
     }
-}
+
+    if (eventType === "payment_intent.succeeded") {
+        if (data.customer) {
+            // Retrieve customer information
+            const customer = await stripe.customers.retrieve(data.customer);
+
+            try {
+                // CREATE ORDER
+                createOrder(customer, data);
+            } catch (err) {
+                console.log(err);
+            }
+        } else {
+            console.log('Customer ID is null in the webhook data');
+        }
+    }
 
 
     res.status(200).end();
