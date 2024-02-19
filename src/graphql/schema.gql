@@ -44,7 +44,7 @@ type Products {
   name_en: String
   name_ru: String
   name_tr: String
-  size: [String]
+  size: [[String]]
   minimum: String
   description_uz: String
   description_en: String

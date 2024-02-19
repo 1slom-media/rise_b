@@ -19,16 +19,17 @@ class StripeController {
                     'products', 'products.parametrs', 'products.brand', 'user'
                 ]
             })
-            const cartFilter = carts.filter(cart => cart.user.id === +user);
+            const cartFilter = carts.filter(cart => cart?.user?.id === +user);
             const truncatedCart = cartFilter.map((cart) => {
                 return {
-                    id: cart.id,
-                    quantity: cart.quantity,
-                    price: cart.price,
-                    products: cart.products.id,
-                    company: cart.company,
+                    id: cart?.id,
+                    quantity: cart?.quantity,
+                    price: cart?.price,
+                    products: cart?.products.id,
+                    company: cart?.company,
                 };
             });
+            console.log(truncatedCart,"card");
 
             const customer = await stripe.customers.create({
                 metadata: {
@@ -38,28 +39,30 @@ class StripeController {
                     punkt: punkt
                 },
             });
+            console.log(customer,"customer");
+            
 
             const session = await stripe.checkout.sessions.create({
                 payment_method_types: ["card"],
                 mode: "payment",
                 line_items: cartFilter.map((cart: any) => {
-                    const price = +cart.price / + cart.quantity
+                    const price = +cart?.price / + cart?.quantity
                     return {
                         price_data: {
                             currency: "usd",
                             product_data: {
-                                name: cart.products.name_uz,
-                                description: cart.products.description_uz,
+                                name: cart?.products?.name_uz,
+                                description: cart?.products?.description_uz,
                                 metadata: {
-                                    id: cart.id,
+                                    id: cart?.id,
                                 },
                             },
                             unit_amount: price * 100,
                         },
-                        quantity: cart.quantity,
+                        quantity: cart?.quantity,
                     }
                 }),
-                customer: customer.id,
+                customer: customer?.id,
                 success_url: "http://localhost:3000/success",
                 cancel_url: "http://localhost:3000/error-pay",
             });
@@ -79,16 +82,16 @@ class StripeController {
                 ]
             })
             
-            const cartFilter = carts.filter(cart => cart.user.id === +user);
+            const cartFilter = carts.filter(cart => cart?.user?.id === +user);
             let amount=0;
             const truncatedCart = cartFilter.map((cart) => {
-                amount += Number(cart.price)
+                amount += Number(cart?.price)
                 return {
-                    id: cart.id,
-                    quantity: cart.quantity,
-                    price: cart.price,
-                    products: cart.products.id,
-                    company: cart.company.company,
+                    id: cart?.id,
+                    quantity: cart?.quantity,
+                    price: cart?.price,
+                    products: cart?.products?.id,
+                    company: cart?.company?.company,
                 };
             });
 
@@ -109,13 +112,13 @@ class StripeController {
 
             const paymentIntent = await stripe.paymentIntents.create({
                 amount: amount*100,
-                customer:customer.id,
+                customer:customer?.id,
                 currency: 'usd',
                 payment_method_types: ["card"],
             });
 
             res.json({
-                clientSecret: paymentIntent.client_secret,
+                clientSecret: paymentIntent?.client_secret,
             });
         } catch (e) {
             res.status(500).json({ error: (e as Error).message });
@@ -127,9 +130,9 @@ class StripeController {
 const createOrder = async (customer, data) => {
     try {
         // console.log(data);
-        const user = customer.metadata.user;
-        const phone = customer.metadata.phone;
-        const punkt = customer.metadata.punkt;
+        const user = customer?.metadata?.user;
+        const phone = customer?.metadata?.phone;
+        const punkt = customer?.metadata?.punkt;
         // console.log(customer.metadata);
 
         const carts = await AppDataSource.getRepository(CartEntity).find({
@@ -137,21 +140,21 @@ const createOrder = async (customer, data) => {
                 'products', 'products.parametrs', 'company', 'user'
             ]
         })
-        const cartFilter = carts.filter(cart => cart.user.id === +user);
+        const cartFilter = carts.filter(cart => cart?.user?.id === +user);
 
         for (const cart of cartFilter) {
-            const rise_price = +cart.price - +cart.product_price
+            const rise_price = +cart?.price - +cart?.product_price
             const order = new OrdersEntity()
-            order.quantity = cart.quantity
-            order.total_price = cart.price
-            order.product_price = cart.product_price
+            order.quantity = cart?.quantity
+            order.total_price = cart?.price
+            order.product_price = cart?.product_price
             order.rise_price = String(rise_price)
-            order.products = cart.products
+            order.products = cart?.products
             order.punkt = punkt
             order.phone = phone
             order.user = user
-            order.indeks = cart.indeks
-            order.company = cart.company
+            order.indeks = cart?.indeks
+            order.company = cart?.company
             await AppDataSource.manager.save(order);
 
             const productId = cart.products.id;
@@ -159,10 +162,10 @@ const createOrder = async (customer, data) => {
 
             for (const indeks of cart.indeks) {
                 const orderColor = indeks["color"];
-                const matchingParam = updatedProduct.parametrs.find(param => param.color === orderColor)
-                const parametrs = await AppDataSource.getRepository(ParametrsEntity).findOne({ where: { id: matchingParam.id } });
+                const matchingParam = updatedProduct?.parametrs.find(param => param?.color === orderColor)
+                const parametrs = await AppDataSource.getRepository(ParametrsEntity).findOne({ where: { id: matchingParam?.id } });
 
-                const count = +parametrs.count - +indeks['count']
+                const count = +parametrs?.count - +indeks['count']
                 parametrs.count = count.toLocaleString();
 
                 await AppDataSource.manager.save(parametrs);
