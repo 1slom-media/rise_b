@@ -29,7 +29,6 @@ class StripeController {
                     company: cart?.company,
                 };
             });
-            console.log(truncatedCart,"card");
 
             const customer = await stripe.customers.create({
                 metadata: {
@@ -39,7 +38,6 @@ class StripeController {
                     punkt: punkt
                 },
             });
-            console.log(customer,"customer");
             
 
             const session = await stripe.checkout.sessions.create({
@@ -129,11 +127,9 @@ class StripeController {
 // Create order function
 const createOrder = async (customer, data) => {
     try {
-        // console.log(data);
         const user = customer?.metadata?.user;
         const phone = customer?.metadata?.phone;
         const punkt = customer?.metadata?.punkt;
-        // console.log(customer.metadata);
 
         const carts = await AppDataSource.getRepository(CartEntity).find({
             relations: [
