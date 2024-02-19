@@ -37,13 +37,15 @@ class CartController {
     }
 
     public async Post(req: Request, res: Response) {
-        const { quantity, products, indeks, user, price,product_price} = req.body
+        let { quantity, products, indeks, user, price,product_price} = req.body
 
         const productsFind = await AppDataSource.getRepository(ProductsEntity).find({
             where:{id:+products},relations:{
                 company:true
             }
         })
+        price=Number(price).toFixed(2)
+        product_price=Number(product_price).toFixed(2)
         const cart = new CartEntity()
         cart.quantity = quantity
         cart.products = products

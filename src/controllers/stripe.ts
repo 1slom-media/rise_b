@@ -16,7 +16,7 @@ class StripeController {
             const { user, punkt, phone } = req.body
             const carts = await AppDataSource.getRepository(CartEntity).find({
                 relations: [
-                    'products', 'products.parametrs', 'products.brand', 'user'
+                    'products', 'products.parametrs', 'products.brand', 'user','company'
                 ]
             })
             const cartFilter = carts.filter(cart => cart?.user?.id === +user);
@@ -63,8 +63,8 @@ class StripeController {
                     }
                 }),
                 customer: customer?.id,
-                success_url: "http://localhost:3000/success",
-                cancel_url: "http://localhost:3000/error-pay",
+                success_url: "https://rise-shopping.com/success",
+                cancel_url: "https://rise-shopping.com/error-pay",
             });
 
             res.json({ url: session.url });
