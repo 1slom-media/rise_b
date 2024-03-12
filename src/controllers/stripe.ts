@@ -38,6 +38,8 @@ class StripeController {
                     punkt: punkt
                 },
             });
+            console.log(customer,"customer");
+            
 
 
             const session = await stripe.checkout.sessions.create({
@@ -45,7 +47,11 @@ class StripeController {
                 mode: "payment",
                 line_items: cartFilter.map((cart: any) => {
                     const price = (+cart?.price / +cart?.quantity).toFixed(2);
+                    console.log(price,"session price");
+                    
                     const unit_amount = (+price * 100);
+                    console.log(unit_amount,"unit a");
+                    
                     return {
                         price_data: {
                             currency: "usd",
@@ -68,6 +74,7 @@ class StripeController {
 
             res.json({ url: session.url });
         } catch (e) {
+            console.log(e);
             res.status(500).json({ error: (e as Error).message });
         }
     }
