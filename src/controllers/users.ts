@@ -124,10 +124,13 @@ class UsersController {
           message: "Phone is unique!? This phone has already been registered",
         });
       }
-    }else{return res.json({
+    } else {
+      return res.json({
         status: 200,
         message: "its test phone",
-      });}
+        code: "10101",
+      });
+    }
   }
 
   // verify phone
