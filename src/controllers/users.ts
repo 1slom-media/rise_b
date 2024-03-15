@@ -125,9 +125,13 @@ class UsersController {
         });
       }
     } else {
+      const user = await AppDataSource.getRepository(UsersEntity).findOne({
+        where: { phone },
+      });
       return res.json({
         status: 200,
         message: "its test phone",
+        data: user,
         code: "10101",
       });
     }
@@ -136,24 +140,24 @@ class UsersController {
   // verify phone
   public async VerifyPhone(req: Request, res: Response) {
     const { phone, code, isWeb, isMobile } = req.body;
+    const foundUser = await AppDataSource.getRepository(UsersEntity).findOne({
+      where: { phone },
+    });
     if (phone === "998912223344" && code === "10101") {
-      const id = Date.now();
+      if (isMobile) {
+        foundUser.isMobile = true;
+      }
+      if (isWeb) {
+        foundUser.isWeb = true;
+      }
+      await AppDataSource.manager.save(foundUser);
       return res.status(200).json({
         status: 200,
         message: "Congratulations, you have successfully registered",
-        token: sign({ id: id }),
-        data: {
-          id: id,
-          name: "TesUser",
-          email: "Test@gmail.com",
-          phone: "998912223344",
-        },
+        token: sign({ id: foundUser.id }),
+        data: foundUser,
       });
     } else {
-      const foundUser = await AppDataSource.getRepository(UsersEntity).findOne({
-        where: { phone },
-      });
-
       if (foundUser) {
         const redisCode = await redis.get(phone);
         if (redisCode && redisCode == code) {

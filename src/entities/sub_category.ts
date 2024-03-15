@@ -4,6 +4,7 @@ import { CategoryEntity } from "./category";
 import { SizeEntity } from "./size";
 import { ProductsEntity } from "./products";
 import { BannerEntity } from "./banner";
+import { KeysEntity } from "./keys";
 
 @Entity({ name: "sub_category" })
 export class SubCategoryEntity {
@@ -47,4 +48,7 @@ export class SubCategoryEntity {
 
     @OneToMany(() => BannerEntity, (banner) => banner.sub_category,{onDelete:"CASCADE",onUpdate:"CASCADE"})
     banner: BannerEntity[]
+
+    @OneToMany(() => KeysEntity, (keys) => keys.sub_category,{onDelete:"CASCADE",onUpdate:"CASCADE"})
+    keys: KeysEntity[]
 }
