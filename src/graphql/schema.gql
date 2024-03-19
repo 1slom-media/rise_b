@@ -1,13 +1,14 @@
 type Query {
   category: [Category]
-  sub_category(category:String): [SubCategory]
+  sub_category(category: String): [SubCategory]
   banner: [Banner]
   size: [Size]
   country: [Country]
   company: [Company]
-  search(s:String,company:String):[Products]
+  search(s: String, company: String): [Products]
+  searches(s: String): [Keys]
   products(
-    id:String
+    id: String
     brand: [String]
     category: [String]
     subcategory: [String]
@@ -61,8 +62,8 @@ type Products {
   country: Country
   company: Company
   brand: Brand
-  createdAt:String
-  updateAt:String
+  createdAt: String
+  updateAt: String
   prices: [Prices]
   parametrs: [Parametrs]
 }
@@ -93,7 +94,7 @@ type Brand {
   brand_ru: String
   brand_tr: String
   products: [Products]
-  company:Company
+  company: Company
 }
 
 type Country {
@@ -103,7 +104,7 @@ type Country {
   country_ru: String
   country_tr: String
   image: String
-  company:[Company]
+  company: [Company]
 }
 
 type Company {
@@ -123,6 +124,15 @@ type SubCategory {
   size: [[Size]]
   banner: [Banner]
   products: [Products]
+}
+
+type Keys {
+  id: Int
+  keys_uz: String
+  keys_en: String
+  keys_ru: String
+  keys_tr: String
+  sub_category: SubCategory
 }
 
 type Size {

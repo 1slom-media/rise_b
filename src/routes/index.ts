@@ -198,5 +198,7 @@ router.get("/dashboard-orders", count.Orders);
 
 // keys
 router.post("/keys", keys.Post);
+router.put("/keys/:id", keys.Put);
+router.delete("/keys/:id", keys.Delete);
 
 export default router;

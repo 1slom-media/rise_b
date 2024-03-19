@@ -31,82 +31,68 @@ class KeysController {
     });
   }
 
-  //   public async Put(req: Request, res: Response) {
-  //     try {
-  //       const {
-  //         sub_category_uz,
-  //         sub_category_en,
-  //         sub_category_ru,
-  //         sub_category_tr,
-  //         category,
-  //       } = req.body;
-  //       const { id } = req.params;
-  //       let image;
-  //       if (req.file) {
-  //         const { filename } = req.file;
-  //         image = filename;
-  //       }
+  public async Put(req: Request, res: Response) {
+    try {
+      let { keys_uz, keys_en, keys_ru, keys_tr, sub_category } = req.body;
+      const { id } = req.params;
 
-  //       // old image delete
-  //       const oldData = await AppDataSource.getRepository(
-  //         KeysEntity
-  //       ).findOne({
-  //         where: { id: +id },
-  //         relations: {
-  //           category: true,
-  //         },
-  //       });
-  //       if (oldData && image && oldData.image != null) {
-  //         const imageToDelete = oldData?.image;
-  //         const imagePath = path.join(process.cwd(), "uploads", imageToDelete);
-  //         fs.unlinkSync(imagePath);
-  //       } else {
-  //         console.log("xato");
-  //       }
+      const findKeys = await AppDataSource.getRepository(KeysEntity).findOne({
+        where: { id: +id },
+        relations: {
+          sub_category: true,
+        },
+      });
 
-  //       oldData.sub_category_uz =
-  //         sub_category_uz != "" ? sub_category_uz : oldData.sub_category_uz;
-  //       oldData.sub_category_en =
-  //         sub_category_en != "" ? sub_category_en : oldData.sub_category_en;
-  //       oldData.sub_category_ru =
-  //         sub_category_ru != "" ? sub_category_ru : oldData.sub_category_ru;
-  //       oldData.sub_category_tr =
-  //         sub_category_tr != "" ? sub_category_tr : oldData.sub_category_tr;
-  //       oldData.category = category != "" ? category : oldData.category.id;
-  //       oldData.image = image != undefined ? image : oldData.image;
+      if (findKeys) {
+        keys_uz = keys_uz.toLowerCase();
+        keys_en = keys_en.toLowerCase();
+        keys_ru = keys_ru.toLowerCase();
+        keys_tr = keys_tr.toLowerCase();
 
-  //       await AppDataSource.manager.save(oldData);
-  //       res.json({
-  //         status: 200,
-  //         message: "subcategory updated",
-  //         data: oldData,
-  //       });
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   }
+        findKeys.keys_uz = keys_uz != undefined ? keys_uz : findKeys.keys_uz;
+        findKeys.keys_en = keys_en != undefined ? keys_en : findKeys.keys_en;
+        findKeys.keys_ru = keys_ru != undefined ? keys_ru : findKeys.keys_ru;
+        findKeys.keys_tr = keys_tr != undefined ? keys_tr : findKeys.keys_tr;
+        findKeys.sub_category =
+          sub_category != undefined ? sub_category : findKeys.sub_category?.id;
+        await AppDataSource.manager.save(findKeys);
+        res.json({
+          status: 200,
+          message: "keys updated",
+          data: findKeys,
+        });
+      } else {
+        res.json({
+          status: 404,
+          message: "keys not found",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
-  //   public async Delete(req: Request, res: Response) {
-  //     try {
-  //       const { id } = req.params;
+  public async Delete(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
 
-  //       const sub_category = await AppDataSource.getRepository(KeysEntity)
-  //         .createQueryBuilder()
-  //         .delete()
-  //         .from(KeysEntity)
-  //         .where({ id })
-  //         .returning("*")
-  //         .execute();
+      const keys = await AppDataSource.getRepository(KeysEntity)
+        .createQueryBuilder()
+        .delete()
+        .from(KeysEntity)
+        .where({ id })
+        .returning("*")
+        .execute();
 
-  //       res.json({
-  //         status: 200,
-  //         message: "subcategory deleted",
-  //         data: sub_category.raw[0],
-  //       });
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   }
+      res.json({
+        status: 200,
+        message: "keys deleted",
+        data: keys.raw[0],
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
 }
 
 export default new KeysController();
